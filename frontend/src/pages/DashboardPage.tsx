@@ -1,50 +1,60 @@
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Clock3, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatDate, formatWeight } from '../api/weightStatistics';
 import { CurrentWeightCard } from '../components/CurrentWeightCard';
-import { PressureMap } from '../components/PressureMap';
-import { StatisticsCards } from '../components/StatisticsCards';
+import { BmiCard, DashboardSummary } from '../components/DashboardSummary';
+import { PressureSensorsCard } from '../components/PressureSensorsCard';
 import { WeightHistoryChart } from '../components/WeightHistoryChart';
+import { useBoardReading } from '../hooks/useBoardReading';
 import { useGraviaData } from '../hooks/useGraviaData';
 export function DashboardPage() {
-  const { profile, profileId, measurements, live } = useGraviaData();
+  const { profile, profileId, measurements } = useGraviaData();
+  const { reading, showingLive, active } = useBoardReading();
   const readings = measurements.filter((item) => item.profileId === profileId);
   return (
     <>
-      <div className="page-title">
-        <div className="eyebrow">IL TUO BENESSERE, IN PROSPETTIVA</div>
-        <h1>
-          Ciao, {profile?.name || 'benvenuto'}
-          <span className="greeting-dot">.</span>
-        </h1>
-        <p>Prenditi un momento per te. Al resto pensa Gravia.</p>
-      </div>
-      <div className="dashboard-main">
+      <h1 className="sr-only">Dashboard di {profile?.name || 'Gravia'}</h1>
+      <div className="dashboard-grid">
         <CurrentWeightCard />
-        <PressureMap reading={live.sessionEvent?.profileId === profileId ? live.reading : null} />
-      </div>
-      <StatisticsCards />
-      <div className="dashboard-bottom">
+        <PressureSensorsCard reading={reading} live={showingLive && active} />
         <WeightHistoryChart measurements={readings} />
         <section className="card recent-card">
           <div className="card-heading">
-            <h2>Ultime misurazioni</h2>
-            <Link to="/history" aria-label="Apri storico">
-              <ArrowRight size={19} />
+            <h2>
+              <span className="heading-icon">
+                <Clock3 size={20} />
+              </span>
+              Ultime misurazioni
+            </h2>
+            <Link to="/history" className="view-all" aria-label="Apri storico">
+              Vedi tutto <ArrowRight size={15} />
             </Link>
           </div>
           {readings.length ? (
-            readings.slice(0, 3).map((item) => (
-              <div className="recent-reading" key={item.id}>
-                <div>
-                  <strong>
-                    {formatWeight(item.weight)} <span>kg</span>
-                  </strong>
-                  <p>{formatDate(item.measuredAt)}</p>
-                </div>
-                <span className="stability-badge">{Math.round(item.stability)}%</span>
-              </div>
-            ))
+            <div className="table-scroll recent-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data e ora</th>
+                    <th>Peso (kg)</th>
+                    <th>Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {readings.slice(0, 6).map((item) => (
+                    <tr key={item.id}>
+                      <td>{formatDate(item.measuredAt)}</td>
+                      <td>
+                        <strong>{formatWeight(item.weight)}</strong>
+                      </td>
+                      <td>
+                        <span title={item.notes || undefined}>{item.notes || '—'}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="recent-empty">
               <Sparkles size={25} />
@@ -52,11 +62,9 @@ export function DashboardPage() {
               <p>Le tue pesate appariranno qui, una alla volta.</p>
             </div>
           )}
-          <div className="insight-note">
-            <span>BUONO A SAPERSI</span>
-            <p>Misurati alla stessa ora per confrontare meglio i tuoi progressi.</p>
-          </div>
         </section>
+        <DashboardSummary />
+        <BmiCard />
       </div>
       <p className="dashboard-footnote">
         Un numero racconta un momento. Il tuo percorso racconta molto di più.

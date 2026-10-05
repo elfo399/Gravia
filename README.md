@@ -30,6 +30,8 @@ La tua **Nintendo Wii Balance Board** diventa una bilancia smart, con un'esperie
 
 Una dashboard riunisce misurazioni, variazioni e statistiche. Ogni persona ha il proprio profilo e il proprio storico. I dati restano nella tua installazione, senza creare un account cloud.
 
+Scegli la luce giusta per te: **tema chiaro, scuro o automatico**, per ritrovare il tuo spazio anche la sera.
+
 ## Pronta per una nuova vita
 
 Usa Gravia con la tua Balance Board e un Raspberry Pi. Oppure esplora la **modalità demo**: puoi conoscere l'app e provare una pesata simulata anche senza hardware.

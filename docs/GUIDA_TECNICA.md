@@ -39,6 +39,12 @@ L'applicazione espone la porta soltanto su `127.0.0.1`. Non richiede autenticazi
 - REST, WebSocket nativo con riconnessione e ripristino dello stato live, errori leggibili, SQLite persistente e migration Alembic.
 - Board reale con connessione persistente, lettura in background, reconnect, stato hardware e diagnostica Python.
 
+## Aspetto e tema
+
+La dashboard riunisce peso e pedana nella stessa card, i quattro sensori con kg e percentuali, andamento a 7/30/90 giorni o un anno, ultime sei pesate, statistiche per periodo e BMI del profilo. La distribuzione mostra i campioni live durante una pesata oppure i sensori dell'ultima misurazione salvata del profilo selezionato; gli stati vuoti non inventano dati.
+
+Usa il pulsante sole/luna nella barra superiore per cambiare rapidamente tema. In **Impostazioni → Aspetto** puoi scegliere **Chiaro, Scuro o Sistema**. Sistema segue il tema del dispositivo, anche quando cambia mentre Gravia è aperta. La preferenza è salvata nel browser e condivisa fra le sue schede; non cambia con il profilo, non modifica il database e non richiede il Raspberry. Colori, controlli, grafici e dialog di calibrazione seguono lo stesso tema. Il tema salvato viene applicato prima dell'avvio React per evitare il lampeggio chiaro al caricamento.
+
 ## Stack
 
 Frontend: React, TypeScript, Vite, React Router, Tailwind CSS, una primitiva Button basata su shadcn/ui e Radix, Lucide React, Recharts. Comunicazione con `fetch` e `WebSocket` nativi. Vitest, Testing Library e Biome.

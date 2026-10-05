@@ -1,3 +1,17 @@
+# Dashboard e temi · 5 ottobre 2026
+
+Verifica locale con dati demo e database temporaneo, separati dal Raspberry.
+
+| Controllo | Esito |
+| --- | --- |
+| Frontend Vitest | **60 passati**, inclusi 7 casi dei temi e 5 casi delle letture isolate per profilo |
+| Biome / TypeScript / Vite | Lint e build passati |
+| Docker runtime | Immagine finale amd64 costruita con la nuova interfaccia |
+| Browser desktop | Dashboard a sei card, temi chiaro e scuro, preferenza conservata al ricaricamento |
+| Browser mobile 390×844 | Dashboard e navigazione accessibili, nessuno scorrimento orizzontale |
+| Pesata demo | Completata e salvata; peso, sensori, grafico e statistiche aggiornati |
+| Isolamento dati | Storico sintetico usato soltanto nell'anteprima locale; nessuna pesata di test sul Raspberry |
+
 # Calibrazione Gravia · 5 ottobre 2026
 
 Verifica locale su Docker Desktop / container Linux, con board simulate e database temporanei separati dai dati personali.

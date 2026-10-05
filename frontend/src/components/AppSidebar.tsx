@@ -1,8 +1,9 @@
 import {
-  Activity,
   ArrowUpRight,
+  Battery,
   ChartNoAxesCombined,
   CircleHelp,
+  Gauge,
   History,
   LayoutDashboard,
   Scale,
@@ -25,9 +26,12 @@ export function AppSidebar() {
     <aside className="sidebar">
       <NavLink to="/" className="brand" aria-label="Gravia home">
         <span className="brand-mark">
-          <Activity size={23} />
+          <Gauge size={40} strokeWidth={1.5} />
         </span>
-        GRAVIA<span className="brand-dot">.</span>
+        <span className="brand-copy">
+          <b>Gravia</b>
+          <small>Weight. Balance. Insight.</small>
+        </span>
       </NavLink>
       <div className="sidebar-caption">IL TUO SPAZIO</div>
       <nav>
@@ -45,18 +49,39 @@ export function AppSidebar() {
       </nav>
       <div className="sidebar-bottom">
         <div className="board-mini">
-          <Scale size={22} />
-          <div>
-            <strong>Balance Board</strong>
-            <span>
-              <i className={`status-dot ${live.board?.connected ? '' : 'offline'}`} />
-              {live.board?.mode === 'demo'
-                ? 'Modalità demo'
-                : live.board?.connected
-                  ? 'Connessa'
-                  : 'Non connessa'}
-            </span>
+          <div className="board-mini-heading">
+            <Scale size={22} />
+            <div>
+              <strong>Balance Board</strong>
+              <span>
+                <i className={`status-dot ${live.board?.connected ? '' : 'offline'}`} />
+                {live.board?.mode === 'demo'
+                  ? 'Modalità demo'
+                  : live.board?.connected
+                    ? 'Connessa'
+                    : 'Non connessa'}
+              </span>
+            </div>
           </div>
+          {live.board?.battery != null && (
+            <div className="board-battery">
+              <span>
+                Batteria{' '}
+                <b>
+                  <Battery size={15} />
+                  {live.board.battery}%
+                </b>
+              </span>
+              <div className="meter-track">
+                <span style={{ width: `${live.board.battery}%` }} />
+              </div>
+            </div>
+          )}
+          <p>
+            {live.board?.mode === 'demo'
+              ? 'Esplora Gravia senza hardware'
+              : 'Wii Balance Board · Bluetooth'}
+          </p>
         </div>
         <a href="/docs" target="_blank" rel="noreferrer" className="sidebar-help">
           <CircleHelp size={17} />

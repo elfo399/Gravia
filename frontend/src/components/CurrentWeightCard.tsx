@@ -1,80 +1,96 @@
 import { ArrowUpRight, Check, Scale, X } from 'lucide-react';
 import { formatDate, formatWeight } from '../api/weightStatistics';
+import { useBoardReading } from '../hooks/useBoardReading';
 import { useGraviaData } from '../hooks/useGraviaData';
 import { useMeasurementSession } from '../hooks/useMeasurementSession';
-import { activeStatuses } from '../types/MeasurementSession';
 import { MeasurementStatus } from './MeasurementStatus';
+import { PressureMap } from './PressureMap';
 import { Button } from './ui/Button';
 
 export function CurrentWeightCard() {
-  const { profile, profileId, measurements, live } = useGraviaData();
+  const { profile, profileId, live } = useGraviaData();
   const action = useMeasurementSession();
-  const latest = measurements.find((item) => item.profileId === profileId);
+  const { latest, reading, status, active, showingLive } = useBoardReading();
   const belongsToProfile = live.sessionEvent?.profileId === profileId;
-  const sessionStatus = belongsToProfile ? live.sessionEvent?.status : undefined;
-  const status =
-    sessionStatus === 'COMPLETED' &&
-    live.completed &&
-    !measurements.some((item) => item.id === live.completed?.id)
-      ? undefined
-      : sessionStatus;
-  const active = !!live.sessionEvent && activeStatuses.includes(live.sessionEvent.status);
-  const showingLive = belongsToProfile && (active || status === 'COMPLETED');
   const weight = showingLive
     ? (live.completed?.weight ?? live.reading?.weight ?? 0)
     : latest?.weight;
   return (
     <section className="card weight-card">
       <div className="card-heading">
-        <div className="eyebrow">IL TUO PESO</div>
-        <span className="soft-icon">
-          <Scale size={20} />
+        <h2>
+          <span className="heading-icon">
+            <Scale size={20} />
+          </span>
+          Peso attuale
+        </h2>
+        <span className="card-context">
+          {showingLive && active ? 'Live' : latest ? 'Ultima pesata' : 'Pronto'}
         </span>
       </div>
-      <div className="weight-value">
-        {formatWeight(weight)}
-        <span>kg</span>
-      </div>
-      <MeasurementStatus status={status} stability={live.reading?.stability || 0} />
-      <div className="weight-meta">
-        {status === 'COMPLETED' ? (
-          <>
-            <Check size={14} /> Salvata automaticamente nel tuo storico
-          </>
-        ) : active ? (
-          'Respira normalmente e distribuisci il peso sui due piedi.'
-        ) : latest ? (
-          `Ultima misurazione · ${formatDate(latest.measuredAt)}`
-        ) : (
-          'Un piccolo gesto. Una nuova prospettiva.'
-        )}
-      </div>
-      <div className="weight-actions">
-        {active ? (
-          <Button
-            variant="outline"
-            disabled={action.busy}
-            onClick={() => live.sessionEvent && action.cancel(live.sessionEvent.sessionId)}
-          >
-            <X size={17} />
-            Annulla misurazione
-          </Button>
-        ) : (
-          <Button
-            disabled={
-              action.busy ||
-              !profile ||
-              !live.connected ||
-              !live.board?.connected ||
-              live.board.calibrationActive
-            }
-            onClick={() => action.start(profileId)}
-          >
-            {action.busy ? 'Avvio in corso…' : 'Inizia misurazione'}
-            <ArrowUpRight size={18} />
-          </Button>
-        )}
-        <span>{active ? 'Sessione in corso' : 'Circa 10 secondi'}</span>
+      <div className="weight-overview">
+        <div className="weight-reading">
+          <div className="weight-value">
+            {formatWeight(weight)}
+            <span>kg</span>
+          </div>
+          <MeasurementStatus status={status} stability={live.reading?.stability || 0} />
+          <div className="stability-meter">
+            <div>
+              <span>Stabilità della misura</span>
+              <strong>{reading ? `${Math.round(reading.stability)}%` : '—'}</strong>
+            </div>
+            <meter
+              className="reading-meter"
+              aria-label="Stabilità della misura"
+              min={0}
+              max={100}
+              value={Math.max(0, Math.min(100, reading?.stability ?? 0))}
+              aria-valuetext={reading ? `${Math.round(reading.stability)}%` : 'Nessun dato'}
+            />
+          </div>
+          <div className="weight-meta">
+            {status === 'COMPLETED' ? (
+              <>
+                <Check size={14} /> Salvata automaticamente nel tuo storico
+              </>
+            ) : active ? (
+              'Respira normalmente e distribuisci il peso sui due piedi.'
+            ) : latest ? (
+              `Ultima misurazione · ${formatDate(latest.measuredAt)}`
+            ) : (
+              'Un piccolo gesto. Una nuova prospettiva.'
+            )}
+          </div>
+          <div className="weight-actions">
+            {active ? (
+              <Button
+                variant="outline"
+                disabled={action.busy}
+                onClick={() => live.sessionEvent && action.cancel(live.sessionEvent.sessionId)}
+              >
+                <X size={17} />
+                Annulla misurazione
+              </Button>
+            ) : (
+              <Button
+                disabled={
+                  action.busy ||
+                  !profile ||
+                  !live.connected ||
+                  !live.board?.connected ||
+                  live.board.calibrationActive
+                }
+                onClick={() => action.start(profileId)}
+              >
+                {action.busy ? 'Avvio in corso…' : 'Inizia misurazione'}
+                <ArrowUpRight size={18} />
+              </Button>
+            )}
+            <span>{active ? 'Sessione in corso' : 'Circa 10 secondi'}</span>
+          </div>
+        </div>
+        <PressureMap reading={reading} live={showingLive && active} />
       </div>
       {(action.error || (belongsToProfile && live.error)) && (
         <p className="inline-error" role="alert">

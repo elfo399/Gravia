@@ -9,10 +9,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-blue-600 text-white hover:bg-blue-700 px-5 py-3',
-        outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 px-4 py-2.5',
-        ghost: 'text-slate-500 hover:bg-slate-100 px-3 py-2',
-        destructive: 'bg-red-50 text-red-700 hover:bg-red-100 px-4 py-2.5',
+        default: 'button-primary px-5 py-3',
+        outline: 'button-outline px-4 py-2.5',
+        ghost: 'button-ghost px-3 py-2',
+        destructive: 'button-destructive px-4 py-2.5',
       },
     },
     defaultVariants: { variant: 'default' },

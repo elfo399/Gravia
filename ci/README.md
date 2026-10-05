@@ -34,7 +34,9 @@ I parametri iniziali sono `BOARD_MAC=00:24:44:6C:0D:A2`, modalità **real**, `HT
 
 La board usa la rete host del Raspberry, senza capability aggiunte. Se l'hardware è spento, l'app resta healthy e mostra la board offline: il job non pretende una pesata fisica. Accendere/SYNC la board e verificare `connected=true` prima di pesare.
 
-Per Nginx Proxy Manager, inoltrare all'IP LAN del Raspberry, porta **8081**, con Websockets Support. Se si usa il nome `gravia`, occorre il mapping `gravia:host-gateway` nel servizio NPM come spiegato nel [README](../README.md). La pipeline non modifica il proxy degli altri servizi.
+Per Nginx Proxy Manager, l'installazione corrente usa **Forward Hostname `gravia`, Forward Port `8081`, Websockets Support attivo**. Il container `Proxy_Manager` conserva `ExtraHosts=["gravia:host-gateway"]` e le reti `proxy-net` e `proxyManager`. Il mapping è nella configurazione Docker del proxy e sopravvive ai riavvii; conservarlo quando si ricrea il container. Non occorre scrivere un IP nel Proxy Host.
+
+NPM 2.12.6 usa un resolver DNS nel suo inoltro standard, che non legge il mapping di `/etc/hosts`. Nell'Advanced del solo Proxy Host pubblico Gravia usare [npm-gravia-location.conf](npm-gravia-location.conf): la direttiva `proxy_pass` con hostname letterale permette a Nginx di usare quella mappatura e conserva HTTP e WebSocket. Se cambi la porta, aggiorna anche `proxy_pass` in questo snippet. Gravia mantiene la rete host necessaria al Bluetooth; gli altri Proxy Host conservano le loro configurazioni.
 
 ## Test e deploy
 

@@ -192,7 +192,7 @@ Il Compose standard conserva la rete bridge e la pubblicazione localhost configu
 
 La scelta della rete host deriva dal [codice del kernel Linux](https://raw.githubusercontent.com/torvalds/linux/v6.12/net/bluetooth/af_bluetooth.c): `bt_sock_create()` rifiuta namespace diversi da `init_net` con EAFNOSUPPORT. La libreria crea socket **AF_BLUETOOTH / SOCK_SEQPACKET / L2CAP** diretti; non usa D-Bus, socket raw HCI o comandi di amministrazione dell'adattatore. Nel [codice L2CAP](https://raw.githubusercontent.com/torvalds/linux/v6.12/net/bluetooth/l2cap_sock.c), CAP_NET_RAW è richiesto per SOCK_RAW, non per questo socket; la libreria non fa bind a PSM riservati. Perciò non aggiungiamo NET_ADMIN, NET_RAW, dispositivi, mount D-Bus, bluez/libbluetooth, un secondo bluetoothd, privileged o seccomp unconfined. Restano il BlueZ dell'host per il pairing, lo stack Bluetooth del kernel e il [seccomp predefinito Docker](https://docs.docker.com/engine/security/seccomp/). Sono scelte motivate dal codice, **da verificare sul kernel e Docker del Raspberry reale**.
 
-La [rete host Docker](https://docs.docker.com/engine/network/drivers/host/) elimina il DNS di servizio sulla rete bridge. Prima di attivare l'override, aggiungi al servizio **Nginx Proxy Manager nel suo Compose esistente**:
+La [rete host Docker](https://docs.docker.com/engine/network/drivers/host/) elimina il DNS di servizio sulla rete bridge. Per usare il nome `gravia`, il container Nginx Proxy Manager deve avere il mapping persistente `gravia:host-gateway`. Se NPM è gestito con Compose, aggiungilo al suo servizio:
 
 ```yaml
 services:
@@ -201,7 +201,7 @@ services:
       - "gravia:host-gateway"
 ```
 
-Ricrea quel servizio con `docker compose up -d` dalla cartella di NPM. Il Proxy Host può conservare **Forward Hostname gravia, Forward Port 8080, Websockets Support abilitato**. Docker Engine 20.10+ supporta host-gateway; il container NPM deve girare sullo stesso Raspberry. Se il gateway scelto non raggiunge il servizio, usa nel Proxy Host **l'IP LAN del Raspberry e porta 8080**, oppure mappa `gravia` a quell'IP con extra_hosts. Rimuovi eventuali alias bridge `gravia` che puntano a un vecchio container. Il routing effettivo di NPM deve essere verificato sul Raspberry: qui non è disponibile il tuo NPM.
+L'installazione corrente usa il container standalone `Proxy_Manager`, con `ExtraHosts=["gravia:host-gateway"]`, entrambe le reti originali e gli stessi volumi. Il Proxy Host usa **Forward Hostname gravia, Forward Port 8081, Websockets Support abilitato**. NPM 2.12.6 richiede anche la configurazione [Advanced per Gravia](ci/npm-gravia-location.conf): il suo inoltro standard usa un resolver DNS che non legge `/etc/hosts`, mentre `proxy_pass http://gravia:8081` risolve il mapping quando Nginx carica la configurazione. Docker Engine 20.10+ supporta host-gateway; NPM deve girare sullo stesso Raspberry. Conserva il mapping quando ricrei NPM e aggiorna anche lo snippet se cambi porta. HTTPS e WebSocket pubblici sono stati verificati sul Raspberry.
 
 Con rete host Gravia ascolta su `0.0.0.0:${GRAVIA_HTTP_PORT:-8080}` del Raspberry; `GRAVIA_PORT` non cambia questa porta. Verifica che sia libera e usa la stessa porta nel proxy e negli URL di diagnostica. Il deploy Jenkins corrente usa **8081**, perché Jenkins occupa già 8080. L'app resta locale e senza account: usa la LAN fidata o il controllo accessi già previsto dal tuo proxy.
 

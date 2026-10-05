@@ -12,8 +12,11 @@ Verifica eseguita sull'agent nativo `orio-raspberry-pi` di [Jenkins](https://jen
 | Webhook GitHub | Push, JSON, SSL verificato, firma SHA-256 con il secret già configurato su Jenkins; ping firmato **HTTP 200** |
 | Ripristino locale con release difettosa | Applicazione invalida rifiutata, immagine precedente ripristinata, HTTP/WebSocket nuovamente validi, integrità backup SQLite `ok` |
 | Protezione dati | Nessuna pesata avviata durante la verifica CI; `.env` e database conservati sul Raspberry |
+| Proxy NPM con hostname | `gravia:8081`, mapping Docker persistente `gravia:host-gateway`, location Advanced con hostname letterale, `nginx -t` valido |
+| Dominio pubblico | `https://gravia.elfo3.dev/` HTTP 200, health `ok`, snapshot WSS valido, UI «Live connesso» |
+| Altri Proxy Host dopo ricreazione NPM | Docker, Proxy, Orio e Synapse HTTP 200; Jenkins HTTP 403 previsto senza autenticazione |
 
-La board deve essere accesa/SYNC per verificare la connessione e una pesata fisica. Queste prove confermano la pipeline e l'applicazione, non l'accuratezza della bilancia. Il proxy NPM deve inoltrare alla porta 8081 per questa installazione.
+La board deve essere accesa/SYNC per verificare la connessione e una pesata fisica. Queste prove confermano la pipeline e l'applicazione, non l'accuratezza della bilancia. Il proxy NPM inoltra a `gravia:8081` per questa installazione.
 
 # Verifica v0.2 locale · 5 ottobre 2026
 

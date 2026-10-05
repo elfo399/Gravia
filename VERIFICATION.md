@@ -14,6 +14,9 @@ Verifica locale su Docker Desktop / container Linux, con board simulate e databa
 | Browser desktop e mobile 390×844 | Wizard completo, letture di 4 secondi, verifica indipendente e salvataggio su backend di prova |
 | Restart applicazione di prova | Calibrazione ancora Attiva, stessa data e fattore; reset con conferma torna a Non configurata |
 | Isolamento della verifica | Nessuna calibrazione fittizia o pesata di test scritta sul Raspberry |
+| [Jenkins #12](https://jenkins.elfo3.dev/job/Gravia/12/) | **SUCCESS**, 100,277 s: test, build ARM64 e deploy del commit `988c9b1` tramite webhook GitHub |
+| Database sul Raspberry dopo deploy | Revision `0002`, `alembic check` valido, integrità SQLite `ok`, una pesata preesistente conservata, zero calibrazioni fittizie |
+| API e interfaccia pubbliche | Settings HTTP 200, nuovo bundle frontend, WebSocket WSS con `calibrationActive=false`; board spenta, pulsante Calibra correttamente disabilitato |
 
 La calibrazione interna Nintendo resta invariata. Le prove sopra confermano comportamento e persistenza del software, **non l'accuratezza della board fisica**. La procedura con peso noto, restart e cinque pesate reali è nella [guida tecnica](docs/GUIDA_TECNICA.md#procedura-fisica-sul-raspberry). La warning di deprecazione Starlette/TestClient è preesistente e non causa test falliti.
 

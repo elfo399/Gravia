@@ -329,6 +329,8 @@ In **Impostazioni → Calibrazione Balance Board**, Gravia mostra lo stato, la d
 
 Chiudere il wizard o cambiare pagina scarta i dati temporanei. Una disconnessione, lo spegnimento della board o un riavvio interrompono il wizard; la calibrazione precedentemente salvata rimane intatta. Una sessione temporanea scade dopo 10 minuti. Non è possibile avviare una pesata durante la calibrazione, o viceversa, anche da un'altra scheda del browser.
 
+Il peso minimo delle **pesate normali** rimane quello già configurato (20 kg nell'installazione corrente); il wizard accetta anche pesi di riferimento inferiori. Con un carico da 10 kg, oppure vicino alla soglia minima, dopo il salvataggio confronta la lettura live e poi annulla la pesata: non aspettare un risultato automatico sotto soglia. La verifica nel wizard funziona indipendentemente da questo parametro e `StabilityService` non viene modificato.
+
 ### Dati, formula e soglie
 
 La migration **`0002_board_calibration`**, successiva a `0001_initial`, aggiunge `board_calibrations`: ID, MAC univoco, quattro offset, un fattore globale, peso noto, peso prima/dopo e data UTC. La calibrazione appartiene alla board, indipendentemente dai profili. Una nuova calibrazione aggiorna la stessa riga; reset elimina soltanto quella del MAC corrente. Non cambia le pesate già salvate.

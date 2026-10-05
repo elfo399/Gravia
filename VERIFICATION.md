@@ -1,4 +1,21 @@
-# Verifica v0.2 · 5 ottobre 2026
+# Jenkins e deploy Raspberry · 5 ottobre 2026
+
+Verifica eseguita sull'agent nativo `orio-raspberry-pi` di [Jenkins](https://jenkins.elfo3.dev/job/Gravia/), oltre alle prove locali sotto riportate.
+
+| Controllo | Esito |
+| --- | --- |
+| Agent | Linux ARM64 `aarch64`, utente `elfo`, Docker Compose v2.39.4, `flock` disponibile |
+| [Build Jenkins #2](https://jenkins.elfo3.dev/job/Gravia/2/) | **SUCCESS**: 43 test backend + 24 frontend, Ruff, Biome e build ARM64 |
+| Prima installazione | `/home/elfo/gravia`, dati persistenti fuori dal workspace Jenkins |
+| Runtime | Modalità `real`, porta HTTP **8081** (8080 occupata da Jenkins), rete host, capability rimosse |
+| Verifica post-deploy | HTTP health `ok`, snapshot WebSocket `ok`; board configurata ma offline al momento del test |
+| Webhook GitHub | Push, JSON, SSL verificato, firma SHA-256 con il secret già configurato su Jenkins; ping firmato **HTTP 200** |
+| Ripristino locale con release difettosa | Applicazione invalida rifiutata, immagine precedente ripristinata, HTTP/WebSocket nuovamente validi, integrità backup SQLite `ok` |
+| Protezione dati | Nessuna pesata avviata durante la verifica CI; `.env` e database conservati sul Raspberry |
+
+La board deve essere accesa/SYNC per verificare la connessione e una pesata fisica. Queste prove confermano la pipeline e l'applicazione, non l'accuratezza della bilancia. Il proxy NPM deve inoltrare alla porta 8081 per questa installazione.
+
+# Verifica v0.2 locale · 5 ottobre 2026
 
 Verifica eseguita realmente su Windows con Docker Desktop / container Linux. Nessun Raspberry o Bluetooth fisico collegato a questa sessione. La configurazione locale rimane demo su **http://localhost:8081**; gli altri progetti, incluso ORIO, restano invariati.
 

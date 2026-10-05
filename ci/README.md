@@ -20,8 +20,9 @@ In GitHub → Settings → Webhooks:
 - **Payload URL:** `https://jenkins.elfo3.dev/github-webhook/` (slash finale).
 - **Content type:** `application/json`.
 - **Events:** Just the push event; **Active:** attivo; verifica SSL attiva.
+- **Secret:** nell'installazione corrente è allineato al secret webhook già presente su Jenkins, con verifica SHA-256. Nessun secret è salvato nel repository o nei log della pipeline.
 
-Il webhook avvia il polling SCM: il job controlla `main`, quindi i push senza nuove modifiche su quel branch non generano un deploy. Non abilitare il trigger remoto con token. Se Jenkins ha un webhook secret configurato, usare lo stesso secret nel webhook; cambiarlo globalmente richiede coordinamento con gli altri repository. Vedi [plugin GitHub ufficiale Jenkins](https://plugins.jenkins.io/github/).
+Il webhook avvia il polling SCM: il job controlla `main`, quindi i push senza nuove modifiche su quel branch non generano un deploy. Non abilitare il trigger remoto con token. In altre installazioni, se Jenkins ha un webhook secret configurato, usare lo stesso secret nel webhook; cambiarlo globalmente richiede coordinamento con gli altri repository. Vedi [plugin GitHub ufficiale Jenkins](https://plugins.jenkins.io/github/).
 
 ## Prima installazione sul Raspberry
 

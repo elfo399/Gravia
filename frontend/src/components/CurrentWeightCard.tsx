@@ -77,7 +77,11 @@ export function CurrentWeightCard() {
       )}
       {live.connected && live.board?.mode === 'real' && !live.board.connected && (
         <p className="inline-error" role="status">
-          Accendi la Balance Board e attendi la connessione.
+          {live.board.state === 'DISCONNECTING'
+            ? 'Spegnimento Balance Board…'
+            : live.board.state === 'CONNECTING'
+              ? 'Connessione alla Balance Board…'
+              : 'Premi il pulsante Power sulla Balance Board.'}
         </p>
       )}
       <div className="weight-card-footer">

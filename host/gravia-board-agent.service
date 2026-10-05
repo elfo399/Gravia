@@ -1,0 +1,30 @@
+[Unit]
+Description=Gravia Balance Board hardware agent
+Wants=bluetooth.service
+After=bluetooth.service
+
+[Service]
+Type=simple
+User=gravia-board
+Group=gravia-board
+EnvironmentFile=/etc/gravia/board-agent.env
+ExecStart=/usr/bin/python3 /opt/gravia-board-agent/gravia_board_agent.py
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=gravia
+RuntimeDirectoryMode=0750
+UMask=0007
+NoNewPrivileges=true
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

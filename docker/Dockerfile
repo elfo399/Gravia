@@ -11,6 +11,7 @@ RUN pnpm build
 FROM python:3.12-slim-bookworm AS backend-tools
 WORKDIR /app
 COPY backend/ ./
+COPY host/ /host/
 RUN pip install --no-cache-dir -c requirements.lock '.[dev]'
 
 FROM python:3.12-slim-bookworm AS runtime

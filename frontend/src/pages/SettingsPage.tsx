@@ -50,7 +50,7 @@ export function SettingsPage() {
           <p className="settings-note">
             {settings?.boardMode === 'demo'
               ? 'La modalità Demo simula una pesata completa con quattro sensori. Non occorre collegare alcun dispositivo.'
-              : 'Accendi la Wii Balance Board e attendi la connessione Bluetooth.'}
+              : 'Premi Power sulla Balance Board per accenderla. Premilo di nuovo per spegnerla.'}
           </p>
           <div className="setting-row">
             <span>Connessione hardware</span>

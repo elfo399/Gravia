@@ -1,6 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 
+from app.balance_board.bluez_board import BluezRealBoard
 from app.balance_board.demo_board import DemoBoard
 from app.balance_board.real_board import RealBoard
 from app.database.database import create_database_engine
@@ -20,11 +21,14 @@ async def application_lifespan(app):
     app.state.profiles = ProfileService(engine)
     app.state.measurements = MeasurementService(engine)
     app.state.live = LiveMeasurements()
-    board = (
-        DemoBoard()
-        if settings.board_mode == "demo"
-        else RealBoard(settings.board_mac, settings.board_sample_timeout)
-    )
+    if settings.board_mode == "demo":
+        board = DemoBoard()
+    elif settings.board_transport == "bluez":
+        board = BluezRealBoard(
+            settings.board_mac, settings.board_socket, settings.board_sample_timeout
+        )
+    else:
+        board = RealBoard(settings.board_mac, settings.board_sample_timeout)
     app.state.board = board
     app.state.sessions = SessionService(engine, board, settings, app.state.live)
     app.state.sessions.recover_interrupted_sessions()

@@ -1,0 +1,7 @@
+# Keep current Raspberry networking; the hardware agent stays on the host.
+services:
+  gravia:
+    volumes:
+      - /run/gravia:/run/gravia:ro
+    group_add:
+      - "${GRAVIA_BOARD_AGENT_GID:?Run the explicit host agent installer first}"

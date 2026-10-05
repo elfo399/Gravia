@@ -16,7 +16,7 @@ mkdir -p reports
 case "$suite" in
     backend)
         target=backend-tools
-        command='ruff check . && ruff format --check . && pytest -q --junitxml=/tmp/backend.xml'
+        command='ruff check . /host && ruff format --check . /host && pytest -q --junitxml=/tmp/backend.xml'
         ;;
     frontend)
         target=frontend-build

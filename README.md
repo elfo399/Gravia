@@ -40,5 +40,6 @@ Usa Gravia con la tua Balance Board e un Raspberry Pi. Oppure esplora la **modal
 <p align="center">
   Gravia v0.2 &nbsp; · &nbsp;
   <a href="docs/GUIDA_TECNICA.md">Documentazione</a> &nbsp; · &nbsp;
+  <a href="docs/POWER_LIFECYCLE.md">La tua Balance Board</a> &nbsp; · &nbsp;
   <a href="ci/README.md">Sviluppo e deploy</a>
 </p>

@@ -2,6 +2,9 @@
 
 **Weight. Balance. Insight.** Una web app locale che trasforma la Nintendo Wii Balance Board in una bilancia smart. La v0.2 integra la board reale su Raspberry Pi Linux; la modalità demo resta disponibile senza hardware, Bluetooth o account.
 
+Per **Power ON/OFF senza SYNC**, usare `bluez` e la [guida Power lifecycle](POWER_LIFECYCLE.md).
+Le istruzioni wiibalance/L2CAP in questa pagina riguardano il fallback `direct`.
+
 ## Avvio rapido
 
 Prerequisito: Docker Desktop avviato con container Linux e porta 8080 libera.

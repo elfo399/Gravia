@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="GRAVIA_", env_file=".env", extra="ignore")
 
     board_mode: Literal["demo", "real"] = "demo"
+    # Backwards-compatible default; select bluez explicitly after the host installation.
+    board_transport: Literal["bluez", "direct"] = "direct"
+    board_socket: str = "/run/gravia/balance-board.sock"
     board_mac: str = ""
     board_sample_timeout: float = Field(default=2, gt=0)
     database_url: str = "sqlite:///./gravia.db"

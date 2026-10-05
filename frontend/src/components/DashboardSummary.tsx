@@ -112,26 +112,28 @@ export function BmiCard() {
           aria-label="Calcolato dal peso più recente e dall’altezza del profilo"
         />
       </div>
-      <div className="bmi-overview">
-        <strong>
-          {formatWeight(stats.bmi)}
-          <span>BMI</span>
-        </strong>
-        <span className="bmi-caption">
-          Peso e altezza,
-          <br />
-          in un solo indicatore.
-        </span>
+      <div className="bmi-body">
+        <div className="bmi-overview">
+          <strong>
+            {formatWeight(stats.bmi)}
+            <span>BMI</span>
+          </strong>
+          <span className="bmi-caption">
+            Peso e altezza,
+            <br />
+            in un solo indicatore.
+          </span>
+        </div>
+        <div className="bmi-details">
+          <span>
+            Altezza <b>{profile?.heightCm ? `${profile.heightCm} cm` : '—'}</b>
+          </span>
+          <span>
+            Ultimo peso <b>{formatWeight(stats.current)} kg</b>
+          </span>
+        </div>
+        <BmiRange value={stats.bmi} />
       </div>
-      <div className="bmi-details">
-        <span>
-          Altezza <b>{profile?.heightCm ? `${profile.heightCm} cm` : '—'}</b>
-        </span>
-        <span>
-          Ultimo peso <b>{formatWeight(stats.current)} kg</b>
-        </span>
-      </div>
-      <BmiRange value={stats.bmi} />
     </section>
   );
 }

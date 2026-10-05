@@ -15,3 +15,5 @@ data/*
 coverage/
 *.tsbuildinfo
 artifacts/
+reports/
+.gravia-deploy.lock

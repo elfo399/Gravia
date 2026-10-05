@@ -4,13 +4,13 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - "127.0.0.1:${GRAVIA_PORT:-8080}:8080"
+      - "127.0.0.1:${GRAVIA_PORT:-8080}:${GRAVIA_HTTP_PORT:-8080}"
     env_file: .env
     volumes:
       - ./data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v1/health', timeout=3)"]
+      test: ["CMD", "python", "-c", "import os, urllib.request; urllib.request.urlopen('http://localhost:' + os.getenv('GRAVIA_HTTP_PORT', '8080') + '/api/v1/health', timeout=3)"]
       interval: 10s
       timeout: 5s
       retries: 5

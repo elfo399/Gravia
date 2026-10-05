@@ -131,6 +131,7 @@ La sessione può essere annullata e va in errore al timeout, anche se l'adapter 
 | `GRAVIA_BOARD_LOCK_PATH` | `/data/real-board.lock` | Lock locale condiviso da app e diagnostica; per sviluppo nativo scegli una cartella scrivibile |
 | `COMPOSE_FILE` | non impostato | Sul Raspberry: `docker-compose.yml:docker-compose.raspberry.yml` |
 | `GRAVIA_PORT` | `8080` | Porta pubblicata su localhost (8081 su questo computer) |
+| `GRAVIA_HTTP_PORT` | `8080` | Porta del processo HTTP; in rete host è la porta del Raspberry |
 | `GRAVIA_DATABASE_URL` | `sqlite:////data/gravia.db` | SQLite nel container |
 | `GRAVIA_MINIMUM_WEIGHT` | `20` | Peso minimo rilevato, kg |
 | `GRAVIA_REQUIRED_STABILITY` | `95` | Score richiesto, 0–100 |
@@ -187,7 +188,7 @@ Alla chiusura si interrompono i retry, si chiudono i socket con `disconnect()` e
 
 ## Docker Bluetooth e Nginx Proxy Manager
 
-Il Compose standard conserva la rete bridge e la pubblicazione localhost configurabile (8081 su questo computer). Per il Raspberry Linux usa **docker-compose.raspberry.yml**: rete host, nessuna pubblicazione `ports`, `cap_drop: ALL`, arresto con 120 secondi di tolleranza. Il runtime resta un solo container, porta **8080**, Python 3.12 e frontend compilato. Le immagini ufficiali Python e Node supportano ARM64.
+Il Compose standard conserva la rete bridge e la pubblicazione localhost configurabile (8081 su questo computer). Per il Raspberry Linux usa **docker-compose.raspberry.yml**: rete host, nessuna pubblicazione `ports`, `cap_drop: ALL`, arresto con 120 secondi di tolleranza. Il runtime resta un solo container, porta predefinita **8080** configurabile con `GRAVIA_HTTP_PORT`, Python 3.12 e frontend compilato. Le immagini ufficiali Python e Node supportano ARM64.
 
 La scelta della rete host deriva dal [codice del kernel Linux](https://raw.githubusercontent.com/torvalds/linux/v6.12/net/bluetooth/af_bluetooth.c): `bt_sock_create()` rifiuta namespace diversi da `init_net` con EAFNOSUPPORT. La libreria crea socket **AF_BLUETOOTH / SOCK_SEQPACKET / L2CAP** diretti; non usa D-Bus, socket raw HCI o comandi di amministrazione dell'adattatore. Nel [codice L2CAP](https://raw.githubusercontent.com/torvalds/linux/v6.12/net/bluetooth/l2cap_sock.c), CAP_NET_RAW è richiesto per SOCK_RAW, non per questo socket; la libreria non fa bind a PSM riservati. Perciò non aggiungiamo NET_ADMIN, NET_RAW, dispositivi, mount D-Bus, bluez/libbluetooth, un secondo bluetoothd, privileged o seccomp unconfined. Restano il BlueZ dell'host per il pairing, lo stack Bluetooth del kernel e il [seccomp predefinito Docker](https://docs.docker.com/engine/security/seccomp/). Sono scelte motivate dal codice, **da verificare sul kernel e Docker del Raspberry reale**.
 
@@ -202,7 +203,7 @@ services:
 
 Ricrea quel servizio con `docker compose up -d` dalla cartella di NPM. Il Proxy Host può conservare **Forward Hostname gravia, Forward Port 8080, Websockets Support abilitato**. Docker Engine 20.10+ supporta host-gateway; il container NPM deve girare sullo stesso Raspberry. Se il gateway scelto non raggiunge il servizio, usa nel Proxy Host **l'IP LAN del Raspberry e porta 8080**, oppure mappa `gravia` a quell'IP con extra_hosts. Rimuovi eventuali alias bridge `gravia` che puntano a un vecchio container. Il routing effettivo di NPM deve essere verificato sul Raspberry: qui non è disponibile il tuo NPM.
 
-Con rete host Gravia ascolta su `0.0.0.0:8080` del Raspberry; `GRAVIA_PORT` non cambia questa porta. Verifica che 8080 sia libera. L'app resta locale e senza account: usa la LAN fidata o il controllo accessi già previsto dal tuo proxy.
+Con rete host Gravia ascolta su `0.0.0.0:${GRAVIA_HTTP_PORT:-8080}` del Raspberry; `GRAVIA_PORT` non cambia questa porta. Verifica che sia libera e usa la stessa porta nel proxy e negli URL di diagnostica. Il deploy Jenkins corrente usa **8081**, perché Jenkins occupa già 8080. L'app resta locale e senza account: usa la LAN fidata o il controllo accessi già previsto dal tuo proxy.
 
 ## Raspberry Pi real board test
 
@@ -306,6 +307,10 @@ Per provare specificamente `exec` senza il lettore concorrente, configura tempor
 | App healthy ma board offline | È previsto: REST/UI/database funzionano mentre il lettore riprova. Controlla `/board/status`, non solo l'healthcheck. |
 | NPM restituisce 502 dopo rete host | Aggiungi extra_hosts gravia:host-gateway al servizio NPM e ricrealo, oppure usa IP LAN:8080. Verifica porta 8080 e routing dal container NPM. Mantieni Websockets Support. |
 | Realtime offline ma board connessa | Verifica WebSocket del proxy e `/ws/live`; lo stato hardware e il collegamento browser sono distinti. |
+
+## Pipeline Jenkins
+
+Push GitHub su `main` → test backend/frontend → build ARM64 → deploy sul Raspberry. Configurazione del job, webhook, prima installazione e rollback: [ci/README.md](ci/README.md).
 
 ## Verifiche e limiti
 

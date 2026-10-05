@@ -20,4 +20,4 @@ RUN pip install --no-cache-dir -c requirements.lock . && mkdir -p /data /fronten
 COPY --from=frontend-build /frontend/dist /frontend/dist
 ENV GRAVIA_FRONTEND_DIRECTORY=/frontend/dist
 EXPOSE 8080
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8080"]
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port \"${GRAVIA_HTTP_PORT:-8080}\""]

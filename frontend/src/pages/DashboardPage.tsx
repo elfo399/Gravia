@@ -12,7 +12,7 @@ export function DashboardPage() {
   const { reading, showingLive, active } = useBoardReading();
   const readings = measurements.filter((item) => item.profileId === profileId);
   return (
-    <>
+    <div className="dashboard-page">
       <h1 className="sr-only">Dashboard di {profile?.name || 'Gravia'}</h1>
       <div className="dashboard-grid">
         <CurrentWeightCard />
@@ -66,9 +66,6 @@ export function DashboardPage() {
         <DashboardSummary />
         <BmiCard />
       </div>
-      <p className="dashboard-footnote">
-        Un numero racconta un momento. Il tuo percorso racconta molto di più.
-      </p>
-    </>
+    </div>
   );
 }

@@ -41,6 +41,8 @@ L'applicazione espone la porta soltanto su `127.0.0.1`. Non richiede autenticazi
 
 ## Aspetto e tema
 
+La dashboard desktop distribuisce le sei card nell'altezza disponibile del browser, con layout compatto verificato a 1280×720 e 1920×1000 senza scorrimento. Su mobile, con zoom o messaggi di errore, lo scorrimento resta disponibile per mantenere accessibili i contenuti. La card BMI include la barra blu/verde/gialla/rossa, le soglie e l'indicatore del valore del profilo; senza peso o altezza l'indicatore non viene inventato. I range sono riferimenti per adulti secondo le [categorie BMI CDC](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html), classificati sul valore prima dell'arrotondamento visuale.
+
 La dashboard riunisce peso e pedana nella stessa card, i quattro sensori con kg e percentuali, andamento a 7/30/90 giorni o un anno, ultime sei pesate, statistiche per periodo e BMI del profilo. La distribuzione mostra i campioni live durante una pesata oppure i sensori dell'ultima misurazione salvata del profilo selezionato; gli stati vuoti non inventano dati.
 
 Usa il pulsante sole/luna nella barra superiore per cambiare rapidamente tema. In **Impostazioni → Aspetto** puoi scegliere **Chiaro, Scuro o Sistema**. Sistema segue il tema del dispositivo, anche quando cambia mentre Gravia è aperta. La preferenza è salvata nel browser e condivisa fra le sue schede; non cambia con il profilo, non modifica il database e non richiede il Raspberry. Colori, controlli, grafici e dialog di calibrazione seguono lo stesso tema. Il tema salvato viene applicato prima dell'avvio React per evitare il lampeggio chiaro al caricamento.

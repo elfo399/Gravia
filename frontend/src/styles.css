@@ -2313,3 +2313,247 @@ main {
   background: linear-gradient(90deg, #276cf2, #429eff);
   border-radius: 8px;
 }
+
+.bmi-range {
+  margin: 14px 0 0;
+}
+.bmi-scale {
+  position: relative;
+  display: grid;
+  grid-template-columns: 8.5fr 6.5fr 5fr 10fr;
+  gap: 2px;
+  height: 8px;
+  border-radius: 8px;
+}
+.bmi-segment:first-child {
+  border-radius: 8px 0 0 8px;
+}
+.bmi-segment:last-of-type {
+  border-radius: 0 8px 8px 0;
+}
+.bmi-segment.blue {
+  background: #399cfb;
+}
+.bmi-segment.green {
+  background: #50cf94;
+}
+.bmi-segment.amber {
+  background: #ffbd45;
+}
+.bmi-segment.red {
+  background: #ff647a;
+  border-radius: 0 8px 8px 0;
+}
+.bmi-marker {
+  position: absolute;
+  left: clamp(5px, var(--bmi-position), calc(100% - 5px));
+  top: -4px;
+  width: 10px;
+  height: 16px;
+  border-radius: 5px;
+  border: 2px solid var(--surface);
+  background: var(--text);
+  box-shadow: 0 0 0 1px var(--text-muted);
+  transform: translateX(-50%);
+}
+.bmi-range-labels {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+}
+.bmi-range-labels > span {
+  text-align: center;
+  font-size: 9px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.bmi-range-labels b {
+  display: block;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.bmi-range-labels .current,
+.bmi-range-labels .current b {
+  color: var(--text);
+  font-weight: 750;
+}
+
+/* On desktop the three rows share the available viewport height. Keep normal
+   document flow: errors, zoom and smaller screens can still expand safely. */
+@media (min-width: 900px) and (min-height: 650px) {
+  .main-shell:has(.dashboard-page) > .topbar {
+    height: 56px;
+  }
+  main:has(.dashboard-page) {
+    padding: 10px 20px;
+  }
+  .dashboard-grid {
+    height: calc(100dvh - 76px);
+    grid-template-rows: minmax(250px, 1.2fr) minmax(196px, 1fr) minmax(174px, 0.8fr);
+    gap: 10px;
+  }
+  .dashboard-grid .card {
+    border-radius: 13px;
+  }
+  .dashboard-grid .card-heading h2 {
+    font-size: 14px;
+  }
+  .dashboard-grid .heading-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+  .dashboard-grid .card-heading {
+    gap: 8px;
+  }
+  .dashboard-grid .weight-card {
+    padding: 12px 16px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .dashboard-grid .weight-overview {
+    flex: 1;
+    margin-top: 2px;
+  }
+  .dashboard-grid .weight-value {
+    font-size: clamp(48px, 4vw, 62px);
+    line-height: 1.05;
+    margin: 4px 0;
+  }
+  .dashboard-grid .measurement-status {
+    min-height: 16px;
+  }
+  .dashboard-grid .weight-value > span {
+    font-size: 20px;
+  }
+  .dashboard-grid .stability-meter {
+    margin-top: 6px;
+  }
+  .dashboard-grid .stability-meter > div:first-child {
+    margin-bottom: 3px;
+  }
+  .dashboard-grid .weight-meta {
+    min-height: 0;
+    margin-top: 5px;
+    font-size: 9px;
+  }
+  .dashboard-grid .weight-actions {
+    margin: 6px 0;
+    gap: 8px;
+  }
+  .dashboard-grid .weight-actions button {
+    min-height: 32px;
+    padding: 7px 10px;
+  }
+  .dashboard-grid .weight-card-footer {
+    margin: 0 -16px;
+    padding: 5px 16px;
+    font-size: 9px;
+  }
+  .dashboard-grid .board-figure > svg {
+    max-height: 130px;
+  }
+  .dashboard-grid .sensors-card {
+    padding: 12px 16px;
+  }
+  .dashboard-grid .sensor-grid {
+    margin-top: 10px;
+    gap: 8px;
+  }
+  .dashboard-grid .sensor-tile {
+    padding: 9px 10px;
+  }
+  .dashboard-grid .sensor-value {
+    margin: 6px 0;
+  }
+  .dashboard-grid .sensor-value strong {
+    font-size: 19px;
+  }
+  .dashboard-grid .chart-card {
+    padding: 12px 16px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .dashboard-grid .chart-card > .card-heading {
+    flex-wrap: nowrap;
+  }
+  .dashboard-grid .chart-container {
+    flex: 1;
+    min-height: 120px;
+    height: 0;
+    margin-top: 0;
+  }
+  .dashboard-grid .chart-footer {
+    padding: 7px 0;
+  }
+  .dashboard-grid .empty-chart {
+    height: auto;
+    min-height: 120px;
+    flex: 1;
+  }
+  .dashboard-grid .recent-card {
+    padding: 12px 14px 8px;
+  }
+  .dashboard-grid .recent-table {
+    margin-top: 8px;
+  }
+  .dashboard-grid .recent-table th {
+    padding: 3px 8px;
+    line-height: 13px;
+  }
+  .dashboard-grid .recent-table td {
+    padding: 3px 8px;
+    line-height: 13px;
+  }
+  .dashboard-grid .recent-table td strong {
+    line-height: 13px;
+  }
+  .dashboard-grid .recent-empty {
+    height: auto;
+    min-height: 130px;
+  }
+  .dashboard-grid .summary-card,
+  .dashboard-grid .bmi-card {
+    padding: 12px 16px;
+  }
+  .dashboard-grid .summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 10px;
+    gap: 6px;
+  }
+  .dashboard-grid .summary-tile {
+    padding: 9px 7px;
+  }
+  .dashboard-grid .summary-tile > strong {
+    font-size: 20px;
+    margin: 9px 0 5px;
+  }
+  .dashboard-grid .summary-tile > span {
+    gap: 4px;
+    font-size: 9px;
+  }
+  .dashboard-grid .summary-tile svg {
+    width: 14px;
+  }
+  .dashboard-grid .bmi-overview {
+    margin: 8px 0;
+  }
+  .dashboard-grid .bmi-overview > strong {
+    font-size: 32px;
+  }
+  .dashboard-grid .bmi-details {
+    padding-top: 0;
+    border-top: 0;
+    font-size: 9px;
+    gap: 12px;
+  }
+  .dashboard-grid .bmi-range {
+    margin-top: 10px;
+  }
+  .dashboard-grid:has([role="alert"]),
+  .dashboard-grid:has(.settings-note) {
+    height: auto;
+    min-height: calc(100dvh - 76px);
+  }
+}

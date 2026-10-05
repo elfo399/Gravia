@@ -10,6 +10,7 @@ import {
 import { useState } from 'react';
 import { calculateWeightStatistics, formatWeight } from '../api/weightStatistics';
 import { useGraviaData } from '../hooks/useGraviaData';
+import { BmiRange } from './BmiRange';
 
 export function DashboardSummary() {
   const { measurements, profileId } = useGraviaData();
@@ -130,6 +131,7 @@ export function BmiCard() {
           Ultimo peso <b>{formatWeight(stats.current)} kg</b>
         </span>
       </div>
+      <BmiRange value={stats.bmi} />
     </section>
   );
 }

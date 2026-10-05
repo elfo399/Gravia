@@ -61,7 +61,9 @@ describe('starting a measurement', () => {
     render(<CurrentWeightCard />);
     const button = screen.getByRole('button', { name: 'Inizia misurazione' });
     expect(
-      screen.getByText(connected ? 'Balance Board connessa' : 'Balance Board non connessa'),
+      screen.getByText(
+        connected ? 'Balance Board connessa' : 'Premi il pulsante Power sulla Balance Board.',
+      ),
     ).toBeInTheDocument();
     if (connected) {
       expect(button).toBeEnabled();

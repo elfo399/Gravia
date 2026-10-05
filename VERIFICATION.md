@@ -1,3 +1,13 @@
+# Dashboard compatta e barra BMI · 5 ottobre 2026
+
+| Controllo | Esito |
+| --- | --- |
+| Frontend Vitest | **72 passati**, inclusi limiti esatti delle quattro fasce BMI, dati mancanti e indicatore entro la scala |
+| Biome / TypeScript / Vite | Lint e build passati |
+| Browser 1280×720 e 1920×1000 | Altezza documento uguale alla viewport, senza scorrimento verticale o orizzontale; footer pesata e sei righe recenti visibili |
+| Mobile 390×844 | Barra BMI presente, nessun overflow orizzontale; contenuti scorrevoli e navigazione mobile conservati |
+| Dati di verifica | Sette letture sintetiche soltanto nel database temporaneo locale; dati reali del Raspberry non modificati |
+
 # Dashboard e temi · 5 ottobre 2026
 
 Verifica locale con dati demo e database temporaneo, separati dal Raspberry.

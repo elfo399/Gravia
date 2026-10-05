@@ -12,6 +12,12 @@ export function CurrentWeightCard() {
   const action = useMeasurementSession();
   const { latest, reading, status, active, showingLive } = useBoardReading();
   const belongsToProfile = live.sessionEvent?.profileId === profileId;
+  const boardHint =
+    live.board?.state === 'DISCONNECTING'
+      ? 'Spegnimento Balance Board…'
+      : live.board?.state === 'CONNECTING'
+        ? 'Connessione alla Balance Board…'
+        : 'Premi il pulsante Power sulla Balance Board.';
   const weight = showingLive
     ? (live.completed?.weight ?? live.reading?.weight ?? 0)
     : latest?.weight;
@@ -102,19 +108,14 @@ export function CurrentWeightCard() {
           Calibrazione in corso. Completa o annulla la calibrazione per iniziare una pesata.
         </p>
       )}
-      {live.connected && live.board?.mode === 'real' && !live.board.connected && (
-        <p className="inline-error" role="status">
-          {live.board.state === 'DISCONNECTING'
-            ? 'Spegnimento Balance Board…'
-            : live.board.state === 'CONNECTING'
-              ? 'Connessione alla Balance Board…'
-              : 'Premi il pulsante Power sulla Balance Board.'}
-        </p>
-      )}
       <div className="weight-card-footer">
-        <span>
+        <span role="status">
           <i className={`status-dot ${live.board?.connected ? '' : 'offline'}`} />
-          {live.board?.connected ? 'Balance Board connessa' : 'Balance Board non connessa'}
+          {live.board?.connected
+            ? 'Balance Board connessa'
+            : live.connected && live.board?.mode === 'real'
+              ? boardHint
+              : 'Balance Board non connessa'}
         </span>
         <span className="demo-badge">
           {live.board?.mode === 'demo' ? 'DEMO' : live.board?.mode === 'real' ? 'REALE' : '…'}

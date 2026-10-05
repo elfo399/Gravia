@@ -3091,3 +3091,94 @@ main {
     transition: none;
   }
 }
+@media (max-width: 650px) {
+  .exercise-page .training-back {
+    margin: 0 0 10px;
+  }
+  .exercise-page .training-title {
+    margin-bottom: 12px;
+  }
+  .exercise-page .training-title h1 {
+    font-size: 25px;
+    margin-bottom: 4px;
+  }
+  .exercise-page .training-title p {
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .exercise-page .training-stage {
+    padding: 14px;
+  }
+  .training-stage .card-heading {
+    margin-bottom: 4px;
+  }
+  .training-session-status {
+    min-height: 60px;
+    padding: 10px 0;
+    gap: 6px;
+  }
+  .training-session-status > strong {
+    font-size: 17px;
+  }
+  .training-session-status > span {
+    font-size: 11px;
+  }
+  .training-session-status > .training-countdown {
+    font-size: 40px;
+  }
+  .balance-target {
+    max-width: 205px;
+  }
+  .balance-target figcaption {
+    font-size: 9px;
+    padding: 0;
+  }
+  .training-live-layout {
+    gap: 10px;
+  }
+  .training-live-numbers {
+    padding-top: 12px;
+    gap: 10px;
+  }
+  .training-live-numbers.with-target {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .training-live-numbers > div > span {
+    font-size: 10px;
+  }
+  .training-live-numbers .training-timer {
+    font-size: 30px;
+    letter-spacing: -1px;
+  }
+  .training-live-numbers output {
+    font-size: 25px;
+  }
+  .training-live-numbers small {
+    font-size: 11px;
+  }
+  .training-feedback {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .training-stage-actions {
+    margin-top: 12px;
+    padding-top: 12px;
+    gap: 12px;
+  }
+  .training-stage-actions > button {
+    min-height: 42px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .training-stage-actions > a {
+    min-height: 42px;
+    font-size: 11px;
+  }
+  .symmetry-meter {
+    padding: 20px 4px;
+  }
+  .symmetry-meter > p {
+    margin-top: 18px;
+  }
+}

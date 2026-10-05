@@ -81,7 +81,9 @@ export function TrainingExercisePage({ activityType }: { activityType: ActivityT
               ) : (
                 <BalanceTarget reading={action.reading} shift={activityType === 'WEIGHT_SHIFT'} />
               )}
-              <div className="training-live-numbers">
+              <div
+                className={`training-live-numbers ${activityType === 'WEIGHT_SHIFT' ? 'with-target' : ''}`}
+              >
                 <div>
                   <span>Tempo rimanente</span>
                   <output className="training-timer" aria-label="Tempo rimanente" aria-live="off">

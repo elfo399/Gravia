@@ -12,7 +12,9 @@ Verifica su Docker Desktop Linux, senza inserire dati nel database del Raspberry
 | TypeScript / Vite | Build di produzione riuscita |
 | Docker Compose config / build | Configurazione valida, immagine runtime creata |
 | Browser demo | Balance Hold 30 s, Symmetry 30 s, Weight Shift 10 timeout/40 s: risultati persistiti e visibili |
-| UI mobile | 390×844, nessuno scorrimento orizzontale; menu a sei voci e temi chiaro/scuro |
+| UI mobile | 390×844, nessuno scorrimento orizzontale; target, timer, punteggio e Annulla visibili insieme durante l'esercizio; menu a sei voci e temi chiaro/scuro |
+| Raspberry / Jenkins #19 | SUCCESS; 116 backend e 97 frontend anche su ARM64; health, WebSocket e API Training validi |
+| Database Raspberry | 0003 head, integrity_check ok; pesate precedenti preservate, nessuna divergenza Alembic |
 
 Il demo resta invariato: il centro non raggiunge i target direzionali, quindi Weight Shift
 ha salvato legittimamente zero punti e dieci target mancati. I test con campioni registrati

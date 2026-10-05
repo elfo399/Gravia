@@ -1,0 +1,9 @@
+# Linux / Raspberry only: AF_BLUETOOTH sockets require the host network namespace.
+# Activate via COMPOSE_FILE in .env (see README for the NPM host-gateway mapping).
+services:
+  gravia:
+    network_mode: host
+    ports: !reset []
+    cap_drop:
+      - ALL
+    stop_grace_period: 120s

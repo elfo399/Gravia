@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+node_modules/
+.pnpm-store/
+dist/
+data/*
+!data/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+coverage/
+*.tsbuildinfo
+artifacts/

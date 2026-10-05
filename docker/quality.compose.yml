@@ -1,0 +1,21 @@
+name: gravia-quality
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: backend-tools
+    volumes:
+      - ../backend:/app
+    command: sh -c "ruff check . && ruff format --check . && pytest -q"
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: frontend-tools
+    volumes:
+      - ../frontend:/frontend
+      - frontend_dependencies:/frontend/node_modules
+    command: sh -c "pnpm install --frozen-lockfile && pnpm lint && pnpm test && pnpm build"
+volumes:
+  frontend_dependencies:

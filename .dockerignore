@@ -1,0 +1,12 @@
+.git
+.env
+.venv
+**/node_modules
+**/.pnpm-store
+**/*.tsbuildinfo
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+data
+artifacts

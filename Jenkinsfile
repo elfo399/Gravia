@@ -29,6 +29,10 @@ pipeline {
                     env.RELEASE_IMAGE = "gravia:${env.REVISION.take(12)}-${env.BUILD_NUMBER}"
                     env.DEPLOY_DIRECTORY = params.DEPLOY_DIRECTORY.trim() ?: sh(
                         script: 'printf "%s/gravia" "$HOME"', returnStdout: true).trim()
+                    // A new job registers parameters during its first run: explicitly
+                    // export their defaults, which may not yet exist in the shell environment.
+                    env.BOARD_MAC = params.BOARD_MAC.trim()
+                    env.HTTP_PORT = params.HTTP_PORT.trim()
                 }
             }
         }

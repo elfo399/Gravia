@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiRequest } from '../api/apiRequest';
 import { boardCalibrationApi } from '../api/boardCalibrationApi';
 import { useGraviaData } from '../hooks/useGraviaData';
+import { isActivityActive } from '../types/ActivitySession';
 import type { BoardCalibrationStatus } from '../types/BoardCalibration';
 import type { CalibrationSession } from '../types/CalibrationSession';
 import { activeStatuses, type MeasurementSession } from '../types/MeasurementSession';
@@ -51,6 +52,7 @@ export function BoardCalibrationCard() {
   const real = live.board?.mode === 'real';
   const available = !!live.board?.connected && live.connected;
   const occupied =
+    isActivityActive(live.activityStatus?.status) ||
     activeMeasurement ||
     realtimeMeasurement ||
     !!data?.activeSession ||

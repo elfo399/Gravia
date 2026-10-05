@@ -1,3 +1,31 @@
+# Training v0.3.0 · 5 ottobre 2026
+
+Verifica su Docker Desktop Linux, senza inserire dati nel database del Raspberry.
+
+| Controllo | Esito |
+| --- | --- |
+| Backend Pytest | 116 test passati, inclusi 22 casi Training |
+| Ruff lint / format | Passati su backend; controllati anche gli script deploy modificati |
+| Alembic upgrade / check | 0003 head, nessuna differenza rispetto ai modelli |
+| Frontend Vitest | 97 test passati; 16 flussi UI Training e payload/eventi condivisi |
+| Biome | Passato su tutto il frontend |
+| TypeScript / Vite | Build di produzione riuscita |
+| Docker Compose config / build | Configurazione valida, immagine runtime creata |
+| Browser demo | Balance Hold 30 s, Symmetry 30 s, Weight Shift 10 timeout/40 s: risultati persistiti e visibili |
+| UI mobile | 390×844, nessuno scorrimento orizzontale; menu a sei voci e temi chiaro/scuro |
+
+Il demo resta invariato: il centro non raggiunge i target direzionali, quindi Weight Shift
+ha salvato legittimamente zero punti e dieci target mancati. I test con campioni registrati
+verificano invece target raggiunti, hold continuo, reset e bonus velocità.
+La calibrazione applicata una sola volta prima del punteggio è coperta da un test con
+CalibratedBoard e una calibrazione realmente persistita in SQLite.
+
+Restano da eseguire sulla pedana reale i movimenti, la precisione e le interruzioni Power
+durante Training: [procedura fisica](docs/TRAINING.md#verifica-e-prove-fisiche).
+La warning di deprecazione Starlette/httpx resta presente nei test; le suite passano.
+
+---
+
 # Dashboard compatta e barra BMI · 5 ottobre 2026
 
 | Controllo | Esito |

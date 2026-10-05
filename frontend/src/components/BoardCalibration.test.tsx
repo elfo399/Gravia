@@ -86,6 +86,9 @@ beforeEach(() => {
     selectProfile: vi.fn(),
     refresh: vi.fn(),
     live: {
+      activityStatus: null,
+      activityReading: null,
+      activityCompleted: null,
       connected: true,
       reading: null,
       completed: null,

@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
+from app.models.activity_session import ACTIVE_ACTIVITY_STATUSES, ActivitySession
 from app.models.api_model import utc_now
 from app.models.measurement import Measurement
 from app.models.measurement_session import ACTIVE_STATUSES, MeasurementSession
@@ -47,6 +48,11 @@ class ProfileService:
     def delete_profile(self, profile_id: str):
         profile = self.get_profile(profile_id)
         with Session(self.engine) as db:
+            activities = db.exec(
+                select(ActivitySession).where(ActivitySession.profile_id == profile_id)
+            ).all()
+            if any(activity.status in ACTIVE_ACTIVITY_STATUSES for activity in activities):
+                raise HTTPException(409, "Annulla il Training prima di eliminare questo profilo.")
             sessions = db.exec(
                 select(MeasurementSession).where(MeasurementSession.profile_id == profile_id)
             ).all()
@@ -59,6 +65,9 @@ class ProfileService:
             db.flush()
             for session in sessions:
                 db.delete(session)
+            db.flush()
+            for activity in activities:
+                db.delete(activity)
             db.flush()
             db.delete(profile)
             db.commit()

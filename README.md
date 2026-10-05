@@ -25,6 +25,7 @@ La tua **Nintendo Wii Balance Board** diventa una bilancia smart, con un'esperie
 - **Equilibrio a colpo d'occhio.** Scopri come distribuisci il carico grazie alla mappa dei quattro sensori.
 - **Progressi nel tempo.** Guarda l'andamento a 7, 30 e 90 giorni, confronta le pesate e aggiungi le tue note.
 - **La tua board, su misura.** Una calibrazione guidata con un peso conosciuto, salvata per le prossime pesate e ripristinabile quando vuoi.
+- **Un momento per il tuo equilibrio.** Con Training trovi il centro, segui piccoli spostamenti e osservi l'appoggio sui due piedi. Tre esercizi brevi, risultati personali e nuovi progressi da ritrovare.
 
 ## Il tuo spazio personale
 
@@ -34,14 +35,14 @@ Scegli la luce giusta per te: **tema chiaro, scuro o automatico**, per ritrovare
 
 ## Pronta per una nuova vita
 
-Usa Gravia con la tua Balance Board e un Raspberry Pi. Oppure esplora la **modalità demo**: puoi conoscere l'app e provare una pesata simulata anche senza hardware.
+Usa Gravia con la tua Balance Board e un Raspberry Pi. Oppure esplora la **modalità demo**: puoi conoscere l'app, provare una pesata simulata e scoprire Training anche senza hardware.
 
 <p align="center"><strong>Una board che conosci già. Una nuova abitudine da scoprire.</strong></p>
 
 ---
 
 <p align="center">
-  Gravia v0.2 &nbsp; · &nbsp;
+  Gravia v0.3 &nbsp; · &nbsp;
   <a href="docs/GUIDA_TECNICA.md">Documentazione</a> &nbsp; · &nbsp;
   <a href="docs/POWER_LIFECYCLE.md">La tua Balance Board</a> &nbsp; · &nbsp;
   <a href="ci/README.md">Sviluppo e deploy</a>

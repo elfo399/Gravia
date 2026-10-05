@@ -3,7 +3,13 @@ from sqlmodel import SQLModel
 
 from alembic import context
 from app.configuration import Settings
-from app.models import BoardCalibration, Measurement, MeasurementSession, Profile  # noqa: F401
+from app.models import (  # noqa: F401
+    ActivitySession,
+    BoardCalibration,
+    Measurement,
+    MeasurementSession,
+    Profile,
+)
 
 target_metadata = SQLModel.metadata
 url = Settings().database_url

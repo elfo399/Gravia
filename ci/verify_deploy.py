@@ -19,6 +19,8 @@ async def main():
     if request("health")["status"] != "ok":
         raise RuntimeError("Healthcheck HTTP fallito.")
     board = request("board/status")
+    request("activities/active")
+    request("activities")
     async with asyncio.timeout(10):
         async with connect(f"ws://localhost:{PORT}/ws/live") as websocket:
             event = json.loads(await websocket.recv())
@@ -29,6 +31,7 @@ async def main():
             {
                 "health": "ok",
                 "websocket": "ok",
+                "trainingApi": "ok",
                 "boardMode": board["mode"],
                 "boardConnected": board["connected"],
             }

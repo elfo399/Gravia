@@ -25,6 +25,9 @@ function mockBoard(connected: boolean) {
     loading: false,
     error: '',
     live: {
+      activityStatus: null,
+      activityReading: null,
+      activityCompleted: null,
       connected: true,
       board: {
         mode: 'real',
@@ -45,6 +48,25 @@ function mockBoard(connected: boolean) {
 
 describe('starting a measurement', () => {
   beforeEach(() => mockBoard(false));
+  it('prevents weighing while Training owns the board', () => {
+    const start = mockBoard(true);
+    useGraviaData().live.activityStatus = {
+      type: 'activity_status',
+      activitySessionId: 'a',
+      profileId: 'p',
+      activityType: 'SYMMETRY',
+      status: 'ACTIVE',
+      countdown: 0,
+      durationSeconds: 30,
+      message: null,
+    };
+    render(<CurrentWeightCard />);
+    expect(screen.getByRole('button', { name: 'Inizia misurazione' })).toBeDisabled();
+    expect(
+      screen.getByText('Training in corso. Termina l’attività per iniziare una pesata.'),
+    ).toBeInTheDocument();
+    expect(start).not.toHaveBeenCalled();
+  });
   it('prevents starting a measurement during calibration', () => {
     const start = mockBoard(true);
     const data = useGraviaData();
@@ -85,7 +107,10 @@ describe('starting a measurement', () => {
     if (!data.live.board) throw new Error('Missing test board');
     vi.mocked(useGraviaData).mockReturnValue({
       ...data,
-      live: { ...data.live, board: { ...data.live.board, connected: false, state } },
+      live: {
+        ...data.live,
+        board: { ...data.live.board, connected: false, state },
+      },
     });
     render(<CurrentWeightCard />);
     expect(screen.getByText(message)).toBeInTheDocument();

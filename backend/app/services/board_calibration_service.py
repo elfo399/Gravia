@@ -145,8 +145,11 @@ class BoardCalibrationService:
         if self.is_active or self.lock.locked():
             raise HTTPException(409, "Una calibrazione o una misurazione è già in corso.")
         async with self.lock:
+            self._check_training()
             status = self._available()
-            if self.sessions.get_active_session():
+            if self.sessions.get_active_session() or (
+                self.sessions.task and not self.sessions.task.done()
+            ):
                 raise HTTPException(409, "Termina la misurazione prima di calibrare la board.")
             self.active = CalibrationSession(
                 status.mac_address, time.monotonic() + self.policy.session_seconds
@@ -312,6 +315,7 @@ class BoardCalibrationService:
         if self.is_active or self.lock.locked():
             raise HTTPException(409, "Termina la calibrazione prima di ripristinare.")
         async with self.lock:
+            self._check_training()
             if self.sessions.get_active_session():
                 raise HTTPException(409, "Termina la misurazione prima di ripristinare.")
             self._available_mode()
@@ -322,6 +326,10 @@ class BoardCalibrationService:
                     db.commit()
             self.cached = None
             return self.read()
+
+    def _check_training(self):
+        if self.sessions.activities and self.sessions.activities.is_active:
+            raise HTTPException(409, "Termina il Training prima di modificare la calibrazione.")
 
     def _available_mode(self):
         if self.hardware.get_status().mode != "real":

@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useGraviaData } from '../hooks/useGraviaData';
+import { isActivityActive } from '../types/ActivitySession';
 import { activeStatuses } from '../types/MeasurementSession';
 export function ProfileSelector() {
   const { profiles, profile, profileId, selectProfile, live } = useGraviaData();
@@ -11,7 +12,10 @@ export function ProfileSelector() {
         <select
           aria-label="Profilo attivo"
           value={profileId}
-          disabled={!!live.sessionEvent && activeStatuses.includes(live.sessionEvent.status)}
+          disabled={
+            isActivityActive(live.activityStatus?.status) ||
+            (!!live.sessionEvent && activeStatuses.includes(live.sessionEvent.status))
+          }
           onChange={(event) => selectProfile(event.target.value)}
         >
           {!profiles.length && <option value="">Nessun profilo</option>}

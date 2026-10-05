@@ -8,6 +8,7 @@ import sys
 import time
 import urllib.request
 from pathlib import Path
+from urllib.error import HTTPError
 
 
 def request(path):
@@ -19,12 +20,26 @@ def request(path):
 def main():
     settings = request("settings")
     deadline = time.monotonic() + min(300, max(65, settings["sessionTimeout"] + 5))
-    while request("sessions/active") is not None:
+
+    def occupied():
+        try:
+            activity = request("activities/active")
+        except HTTPError as error:
+            if error.code != 404:
+                raise
+            activity = None  # First deployment from a version without Training.
+        return (
+            request("sessions/active") is not None
+            or activity is not None
+            or request("board/status").get("calibrationActive", False)
+        )
+
+    while occupied():
         if time.monotonic() > deadline:
             raise RuntimeError(
-                "Pesata ancora attiva: deploy annullato prima di sostituire il container."
+                "Board ancora occupata: deploy annullato prima di sostituire il container."
             )
-        print("Attendo il completamento della pesata attiva...", flush=True)
+        print("Attendo la fine dell'attività sulla board...", flush=True)
         time.sleep(5)
     url = os.environ["GRAVIA_DATABASE_URL"]
     if not url.startswith("sqlite:///"):

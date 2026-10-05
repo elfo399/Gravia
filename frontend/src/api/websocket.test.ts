@@ -3,6 +3,86 @@ import { parseLiveEvent } from './websocket';
 
 describe('WebSocket event mapping', () => {
   it.each([
+    {
+      type: 'activity_status',
+      activitySessionId: 'a',
+      profileId: 'p',
+      activityType: 'BALANCE_HOLD',
+      status: 'COUNTDOWN',
+      countdown: 3,
+      durationSeconds: 30,
+      message: null,
+    },
+    {
+      type: 'activity_live',
+      activitySessionId: 'a',
+      elapsed: 4,
+      remaining: 26,
+      score: 850,
+      weight: 72,
+      centerOfPressure: { x: 0, y: 0.1 },
+      data: { centerRadius: 0.15 },
+    },
+    {
+      type: 'activity_completed',
+      activitySessionId: 'a',
+      activity: {
+        id: 'a',
+        profileId: 'p',
+        activityType: 'SYMMETRY',
+        status: 'COMPLETED',
+        score: 900,
+        resultJson: { balancedPercent: 80 },
+      },
+    },
+  ])('maps Training event $type through the existing socket', (event) =>
+    expect(parseLiveEvent(JSON.stringify(event))).toEqual(event),
+  );
+  it.each([
+    {
+      type: 'activity_status',
+      activitySessionId: 'a',
+      profileId: 'p',
+      activityType: 'UNKNOWN',
+      status: 'ACTIVE',
+      countdown: null,
+      durationSeconds: 30,
+    },
+    {
+      type: 'activity_status',
+      activitySessionId: 'a',
+      profileId: 'p',
+      activityType: 'SYMMETRY',
+      status: 'IDLE',
+      countdown: null,
+      durationSeconds: 30,
+    },
+    {
+      type: 'activity_live',
+      activitySessionId: 'a',
+      elapsed: 1,
+      remaining: 29,
+      score: 800,
+      weight: 72,
+      centerOfPressure: { x: null, y: 0 },
+      data: {},
+    },
+    {
+      type: 'activity_completed',
+      activitySessionId: 'a',
+      activity: {
+        id: 'wrong',
+        profileId: 'p',
+        activityType: 'BALANCE_HOLD',
+        status: 'COMPLETED',
+        score: 900,
+        resultJson: {},
+      },
+    },
+  ])('rejects malformed Training event $type', (event) =>
+    expect(parseLiveEvent(JSON.stringify(event))).toBeNull(),
+  );
+  it.each([
     'bad json',
     '{}',
     '{"type":"unknown","sessionId":"s"}',

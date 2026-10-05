@@ -47,9 +47,9 @@ Le due fasi mostrate su Jenkins raggruppano questi passaggi; il log conserva l'e
 3. Build frontend, Biome + Vitest (JUnit in `reports/frontend.xml`).
 4. Build runtime ARM64 con tag `gravia:<commit abbreviato>-<build>` e label del commit.
 5. Bootstrap quando necessario; lock sul percorso di deploy.
-6. Prima di sostituire un container attivo, attesa della pesata corrente e backup SQLite consistente in `/data/jenkins-backups`. I backup restano sul Raspberry e non sono pubblicati come artifact.
+6. Prima di sostituire un container attivo, attesa di pesate, Training e calibrazione, poi backup SQLite consistente in `/data/jenkins-backups`. I backup restano sul Raspberry e non sono pubblicati come artifact.
 7. Tag dell'immagine sul nome usato dal Compose dell'installazione e `compose up --no-build --pull never --wait` del solo servizio `gravia`.
-8. Verifica HTTP health, stato board e snapshot WebSocket. Se fallisce, ripristino dell'immagine precedente e build rossa. Alla prima installazione non esiste un'immagine precedente da ripristinare.
+8. Verifica HTTP health, API Training, stato board e snapshot WebSocket. Se fallisce, ripristino dell'immagine precedente e build rossa. Alla prima installazione non esiste un'immagine precedente da ripristinare.
 
 Gli aggiornamenti preservano database, configurazione e bind mount. Il ripristino automatico riguarda l'immagine; non ripristina il database sopra dati nuovi. Migrazioni future incompatibili richiedono un piano specifico. Conservare i backup e le immagini di release secondo lo spazio disponibile: non è previsto un prune globale, che coinvolgerebbe altri progetti.
 

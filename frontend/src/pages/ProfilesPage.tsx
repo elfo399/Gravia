@@ -3,10 +3,13 @@ import { type FormEvent, useState } from 'react';
 import { profilesApi } from '../api/profilesApi';
 import { Button } from '../components/ui/Button';
 import { useGraviaData } from '../hooks/useGraviaData';
+import { isActivityActive } from '../types/ActivitySession';
 import { activeStatuses } from '../types/MeasurementSession';
 export function ProfilesPage() {
   const { profiles, profileId, selectProfile, refresh, live } = useGraviaData();
-  const sessionActive = !!live.sessionEvent && activeStatuses.includes(live.sessionEvent.status);
+  const sessionActive =
+    isActivityActive(live.activityStatus?.status) ||
+    (!!live.sessionEvent && activeStatuses.includes(live.sessionEvent.status));
   const [editing, setEditing] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [height, setHeight] = useState('');
@@ -150,7 +153,7 @@ export function ProfilesPage() {
             </div>
             {deleting === profile.id && (
               <div className="profile-delete">
-                <p>Eliminare {profile.name} e tutte le sue misurazioni?</p>
+                <p>Eliminare {profile.name}, tutte le sue misurazioni e il suo storico Training?</p>
                 <Button variant="destructive" disabled={busy} onClick={() => remove(profile.id)}>
                   Elimina profilo e dati
                 </Button>

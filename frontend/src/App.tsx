@@ -12,6 +12,8 @@ import { HistoryPage } from './pages/HistoryPage';
 import { ProfilesPage } from './pages/ProfilesPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatisticsPage } from './pages/StatisticsPage';
+import { TrainingExercisePage } from './pages/TrainingExercisePage';
+import { TrainingPage } from './pages/TrainingPage';
 
 function HeaderDate() {
   const [now, setNow] = useState(() => new Date());
@@ -81,6 +83,19 @@ function AppLayout() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/statistics" element={<StatisticsPage />} />
+              <Route path="/training" element={<TrainingPage />} />
+              <Route
+                path="/training/balance-hold"
+                element={<TrainingExercisePage key="balance-hold" activityType="BALANCE_HOLD" />}
+              />
+              <Route
+                path="/training/weight-shift"
+                element={<TrainingExercisePage key="weight-shift" activityType="WEIGHT_SHIFT" />}
+              />
+              <Route
+                path="/training/symmetry"
+                element={<TrainingExercisePage key="symmetry" activityType="SYMMETRY" />}
+              />
               <Route path="/profiles" element={<ProfilesPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route

@@ -10,6 +10,9 @@ class LiveMeasurements:
         self.latest_reading: dict | None = None
         self.latest_completion: dict | None = None
         self.latest_board_status: dict | None = None
+        self.latest_activity_status: dict | None = None
+        self.latest_activity_reading: dict | None = None
+        self.latest_activity_completion: dict | None = None
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -19,6 +22,9 @@ class LiveMeasurements:
             self.latest_status,
             self.latest_reading,
             self.latest_completion,
+            self.latest_activity_status,
+            self.latest_activity_reading,
+            self.latest_activity_completion,
         ):
             if event:
                 await websocket.send_json(event)
@@ -35,6 +41,17 @@ class LiveMeasurements:
             self.latest_reading = event
         elif event["type"] == "measurement_completed":
             self.latest_completion = event
+        elif event["type"] == "activity_status":
+            self.latest_activity_status = event
+            if event["status"] == "WAITING_FOR_USER":
+                self.latest_activity_reading = None
+                self.latest_activity_completion = None
+            if event["status"] in ("ERROR", "CANCELLED"):
+                self.latest_activity_reading = None
+        elif event["type"] == "activity_live":
+            self.latest_activity_reading = event
+        elif event["type"] == "activity_completed":
+            self.latest_activity_completion = event
 
         async def send(connection):
             try:

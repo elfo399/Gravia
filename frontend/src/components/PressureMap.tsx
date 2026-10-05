@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import type { LiveMeasurement } from '../types/Measurement';
+import { pressurePosition } from './pressurePosition';
 
 export function PressureMap({
   reading,
@@ -9,6 +10,9 @@ export function PressureMap({
   live?: boolean;
 }) {
   const id = useId().replace(/:/g, '');
+  const center = reading
+    ? pressurePosition(reading.centerOfPressure, { x: 190, y: 117 }, { x: 114, y: 65 })
+    : null;
   const positions = [
     { key: 'frontLeft', x: 91, y: 66 },
     { key: 'frontRight', x: 289, y: 66 },
@@ -82,8 +86,8 @@ export function PressureMap({
           })}
           {reading && reading.weight > 0 && (
             <circle
-              cx={190 + reading.centerOfPressure.x * 114}
-              cy={117 - reading.centerOfPressure.y * 65}
+              cx={center?.x}
+              cy={center?.y}
               r="6"
               fill="var(--board-cop)"
               stroke="var(--board-light)"

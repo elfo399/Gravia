@@ -29,6 +29,9 @@ beforeEach(() => {
     loading: false,
     error: '',
     live: {
+      activityStatus: null,
+      activityReading: null,
+      activityCompleted: null,
       connected: true,
       board: null,
       sessionEvent: null,

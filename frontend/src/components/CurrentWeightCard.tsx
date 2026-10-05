@@ -3,6 +3,7 @@ import { formatDate, formatWeight } from '../api/weightStatistics';
 import { useBoardReading } from '../hooks/useBoardReading';
 import { useGraviaData } from '../hooks/useGraviaData';
 import { useMeasurementSession } from '../hooks/useMeasurementSession';
+import { isActivityActive } from '../types/ActivitySession';
 import { MeasurementStatus } from './MeasurementStatus';
 import { PressureMap } from './PressureMap';
 import { Button } from './ui/Button';
@@ -82,6 +83,7 @@ export function CurrentWeightCard() {
               <Button
                 disabled={
                   action.busy ||
+                  isActivityActive(live.activityStatus?.status) ||
                   !profile ||
                   !live.connected ||
                   !live.board?.connected ||
@@ -106,6 +108,11 @@ export function CurrentWeightCard() {
       {live.board?.calibrationActive && (
         <p className="settings-note" role="status">
           Calibrazione in corso. Completa o annulla la calibrazione per iniziare una pesata.
+        </p>
+      )}
+      {isActivityActive(live.activityStatus?.status) && (
+        <p className="settings-note" role="status">
+          Training in corso. Termina l’attività per iniziare una pesata.
         </p>
       )}
       <div className="weight-card-footer">

@@ -1,6 +1,6 @@
 # Gravia · Guida tecnica
 
-**Weight. Balance. Insight.** Una web app locale che trasforma la Nintendo Wii Balance Board in una bilancia smart. La v0.2 integra la board reale su Raspberry Pi Linux; la modalità demo resta disponibile senza hardware, Bluetooth o account.
+**Weight. Balance. Insight.** Una web app locale che trasforma la Nintendo Wii Balance Board in una bilancia smart. La v0.3 aggiunge Training alla board reale su Raspberry Pi Linux; la modalità demo resta disponibile senza hardware, Bluetooth o account.
 
 Per **Power ON/OFF senza SYNC**, usare `bluez` e la [guida Power lifecycle](POWER_LIFECYCLE.md).
 Le istruzioni wiibalance/L2CAP in questa pagina riguardano il fallback `direct`.
@@ -29,7 +29,7 @@ docker compose logs --tail=100   # log
 
 L'applicazione espone la porta soltanto su `127.0.0.1`. Non richiede autenticazione ed è progettata per l'uso sul computer locale.
 
-## Cosa contiene la v0.2
+## Cosa contiene la v0.3
 
 - Dashboard responsive: sidebar desktop, navigazione mobile, peso live, mappa SVG di pressione, grafico Recharts con intervalli 7/30/90 giorni.
 - Profili locali: creazione, modifica, selezione ed eliminazione. Eliminare un profilo elimina anche le sue sessioni e misurazioni, dopo conferma nell'interfaccia.
@@ -38,6 +38,7 @@ L'applicazione espone la porta soltanto su `127.0.0.1`. Non richiede autenticazi
 - Statistiche: peso attuale, variazione, media, BMI dinamico, numero di misurazioni, intervallo del peso e stabilità media.
 - REST, WebSocket nativo con riconnessione e ripristino dello stato live, errori leggibili, SQLite persistente e migration Alembic.
 - Board reale con connessione persistente, lettura in background, reconnect, stato hardware e diagnostica Python.
+- Training: Balance Hold, Weight Shift e Symmetry, countdown, punteggi backend, risultati aggregati, storico separato e record personale per profilo. [Architettura, API e prove fisiche](TRAINING.md).
 
 ## Aspetto e tema
 

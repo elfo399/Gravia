@@ -8,6 +8,7 @@ from app.balance_board.demo_board import DemoBoard
 from app.balance_board.real_board import RealBoard
 from app.database.database import create_database_engine
 from app.models.profile import ProfileCreate
+from app.services.activity_service import ActivityService
 from app.services.board_calibration_service import BoardCalibrationService
 from app.services.measurement_service import MeasurementService
 from app.services.profile_service import ProfileService
@@ -41,11 +42,16 @@ async def application_lifespan(app):
         app.state.board = CalibratedBoard(board, calibration)
         app.state.sessions.board = app.state.board
     app.state.sessions.recover_interrupted_sessions()
+    app.state.activities = ActivityService(
+        engine, app.state.board, settings, app.state.live, app.state.sessions, calibration
+    )
+    app.state.activities.recover_interrupted_sessions()
     if settings.demo_seed and not app.state.profiles.list_profiles():
         app.state.profiles.create_profile(ProfileCreate(name="Alfonso", height_cm=180))
 
     async def publish_board_status(status):
         calibration.on_board_status(status)
+        await app.state.activities.on_board_status(status)
         status = status.model_copy(update={"calibration_active": calibration.is_active})
         await app.state.live.publish(
             {
@@ -61,6 +67,7 @@ async def application_lifespan(app):
         yield
     finally:
         try:
+            await app.state.activities.shutdown()
             await calibration.shutdown()
             await app.state.sessions.shutdown()
         finally:

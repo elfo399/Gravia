@@ -105,7 +105,7 @@ export function SettingsPage() {
           </div>
           <div className="setting-row">
             <span>Versione</span>
-            <strong>0.2.0</strong>
+            <strong>0.3.0</strong>
           </div>
           <p className="settings-note">
             Profili e misurazioni restano sul tuo computer, nella cartella data del progetto.

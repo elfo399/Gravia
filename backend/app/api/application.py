@@ -13,7 +13,7 @@ router = APIRouter()
 def health(request: Request):
     with Session(request.app.state.engine) as db:
         db.exec(text("SELECT 1"))
-    return {"status": "ok", "version": "0.2.0"}
+    return {"status": "ok", "version": "0.3.0"}
 
 
 @router.get("/api/v1/board/status", response_model=BoardStatus)

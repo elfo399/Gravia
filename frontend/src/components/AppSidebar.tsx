@@ -1,4 +1,5 @@
 import {
+  Activity,
   ArrowUpRight,
   Battery,
   ChartNoAxesCombined,
@@ -17,6 +18,7 @@ const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/history', label: 'Storico', icon: History },
   { to: '/statistics', label: 'Statistiche', icon: ChartNoAxesCombined },
+  { to: '/training', label: 'Training', icon: Activity },
   { to: '/profiles', label: 'Profili', icon: Users },
   { to: '/settings', label: 'Impostazioni', icon: Settings2 },
 ];
@@ -91,7 +93,7 @@ export function AppSidebar() {
         <p>
           Weight. Balance. Insight.
           <br />
-          <span>Gravia v0.2</span>
+          <span>Gravia v0.3</span>
         </p>
       </div>
     </aside>

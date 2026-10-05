@@ -1,3 +1,6 @@
+from contextlib import aclosing
+
+
 class CalibratedBoard:
     """Apply Gravia correction once, after hardware mapping and before sessions."""
 
@@ -17,5 +20,6 @@ class CalibratedBoard:
         await self.hardware.shutdown()
 
     async def samples(self):
-        async for sample in self.hardware.samples():
-            yield self.calibration.apply(sample)
+        async with aclosing(self.hardware.samples()) as stream:
+            async for sample in stream:
+                yield self.calibration.apply(sample)

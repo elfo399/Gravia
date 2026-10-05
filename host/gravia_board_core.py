@@ -57,7 +57,8 @@ class BoardLifecycle:
         self.device_connected = False
         self.epoch = 0
         self.button_down = None
-        self.first_release = None
+        self.released_since = None
+        self.power_ready_at = None
         self.last_press = float("-inf")
 
     def snapshot(self):
@@ -78,7 +79,8 @@ class BoardLifecycle:
             self.state = "CONNECTING"
             self.reason = self.error = None
             self.button_down = None
-            self.first_release = None
+            self.released_since = None
+            self.power_ready_at = None
         else:
             self.close_reader()
             if self.reason != "USER_POWER_OFF":
@@ -86,24 +88,39 @@ class BoardLifecycle:
             self.state = "WAITING_FOR_POWER"
         self.publish(self.snapshot())
 
-    def sample(self):
-        if self.state == "CONNECTING":
+    def sample(self, now):
+        if (
+            self.state == "CONNECTING"
+            and self.power_ready_at is not None
+            and now >= self.power_ready_at
+            and self.button_down is False
+            and self.released_since is not None
+            and now - self.released_since >= 0.5
+        ):
             self.state = "CONNECTED"
             self.error = None
             self.publish(self.snapshot())
         return self.state == "CONNECTED"
 
     def button(self, pressed, now):
-        # The press that powers the device on must never be interpreted as power-off.
+        # On this board the power-on edge can arrive seconds after the first
+        # neutral HID reports (up to 6.2 s observed on the Raspberry). Let startup
+        # settle, then require a released button before accepting a new press.
         previous, self.button_down = self.button_down, pressed
-        if not pressed and self.first_release is None:
-            self.first_release = now
+        if self.power_ready_at is None:
+            self.power_ready_at = now + 10
+        if not pressed:
+            if previous is not False:
+                self.released_since = now
+            return
+        released_since, self.released_since = self.released_since, None
         if (
             pressed
             and previous is False
             and self.state == "CONNECTED"
-            and self.first_release is not None
-            and now - self.first_release >= 0.5
+            and now >= self.power_ready_at
+            and released_since is not None
+            and now - released_since >= 0.5
             and now - self.last_press >= 0.5
         ):
             self.last_press = now

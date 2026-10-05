@@ -174,7 +174,7 @@ class Agent:
                 if sample is None:
                     continue
                 self.last_packet = now
-                if self.core.sample() and now - self.last_sent >= 0.1:
+                if self.core.sample(now) and now - self.last_sent >= 0.1:
                     self.last_sent = now
                     self.sequence += 1
                     self.publish(

@@ -17,6 +17,11 @@ def lifecycle():
     return board, events, actions
 
 
+def ready(board, now=0):
+    board.button(False, now)
+    assert board.sample(now + 10)
+
+
 def test_waiting_and_device_initiated_connection():
     board, events, actions = lifecycle()
     assert board.state == "WAITING_FOR_POWER"
@@ -24,7 +29,9 @@ def test_waiting_and_device_initiated_connection():
     assert actions == []
     board.changed(True)
     assert events[-1]["state"] == "CONNECTING"
-    assert board.sample()
+    board.button(False, 0)
+    assert not board.sample(9)
+    assert board.sample(10)
     assert events[-1]["state"] == "CONNECTED"
     assert board.epoch == 1
 
@@ -33,16 +40,17 @@ def test_power_edge_debounce_release_reader_before_disconnect_and_passive_wait()
     board, events, actions = lifecycle()
     board.changed(True)
     board.button(True, 1)  # The initial power-on press can still be held.
-    board.sample()
+    assert not board.sample(2)
     board.button(True, 2)
     assert actions == []
     board.button(False, 3)
-    board.button(True, 4)
-    board.button(True, 4.01)
-    board.button(False, 4.02)
-    board.button(True, 4.03)
+    assert board.sample(11)
+    board.button(True, 12)
+    board.button(True, 12.01)
+    board.button(False, 12.02)
+    board.button(True, 12.03)
     assert actions == ["close", "disconnect"]
-    assert not board.sample()
+    assert not board.sample(13)
     board.changed(True)  # A delayed property notification must not reopen the reader.
     assert board.state == "DISCONNECTING"
     board.changed(False)
@@ -50,25 +58,24 @@ def test_power_edge_debounce_release_reader_before_disconnect_and_passive_wait()
     assert board.reason == "USER_POWER_OFF"
     for _ in range(10):
         board.changed(False)
-        assert not board.sample()
+        assert not board.sample(14)
     assert actions.count("disconnect") == 1
     board.changed(True)
     assert board.epoch == 2
-    board.button(False, 5)
-    assert board.sample()
+    ready(board, 20)
     assert board.reason is None
 
 
 def test_unexpected_loss_closes_input_and_waits_for_new_power():
     board, _, actions = lifecycle()
     board.changed(True)
-    board.sample()
+    ready(board)
     board.changed(False)
     assert board.reason == "CONNECTION_LOST"
     assert board.state == "WAITING_FOR_POWER"
     assert actions == ["close"]
     board.changed(True)
-    assert board.sample()
+    ready(board, 20)
 
 
 def test_kernel_calibration_sensor_mapping_and_identical_packets():
@@ -91,15 +98,22 @@ def test_invalid_calibration_rejected(text):
         core.parse_calibration(text)
 
 
-def test_startup_release_grace_does_not_power_off_on_delayed_input_event():
+@pytest.mark.parametrize("delay", [0.1, 2.64, 6.2, 9.9])
+def test_startup_release_grace_does_not_power_off_on_delayed_input_event(delay):
     board, _, actions = lifecycle()
     board.changed(True)
-    board.sample()
     board.button(False, 10)
-    board.button(True, 10.1)
+    board.button(True, 10 + delay)
     assert actions == []
-    board.button(False, 10.2)
-    board.button(True, 10.6)
+    board.button(True, 20)  # Holding the startup gesture cannot become an off edge.
+    assert not board.sample(20)
+    assert actions == []
+    board.button(False, 21)
+    board.button(True, 21.1)  # Release bounce cannot arm Power.
+    assert actions == []
+    board.button(False, 22)
+    assert board.sample(22.6)
+    board.button(True, 23)
     assert actions == ["close", "disconnect"]
 
 
@@ -107,10 +121,11 @@ def test_power_uses_core_button_reports_even_without_sensor_payload():
     board, _, actions = lifecycle()
     board.changed(True)
     board.button(core.report_button(bytes([0x20, 0, 8])), 1)
-    board.sample()
+    assert not board.sample(1)
     board.button(core.report_button(bytes([0x32, 0, 0])), 2)
     assert actions == []
-    board.button(core.report_button(bytes([0x30, 0, 8])), 3)
+    assert board.sample(11)
+    board.button(core.report_button(bytes([0x30, 0, 8])), 12)
     assert actions == ["close", "disconnect"]
     assert core.report_button(bytes([0x3D, 0, 8])) is None
     assert core.report_button(bytes([0x20, 0])) is None
@@ -119,9 +134,8 @@ def test_power_uses_core_button_reports_even_without_sensor_payload():
 def test_reader_error_cannot_acknowledge_an_intentional_bluetooth_disconnect():
     board, events, _ = lifecycle()
     board.changed(True)
-    board.sample()
-    board.button(False, 10)
-    board.button(True, 11)
+    ready(board)
+    board.button(True, 16)
     board.reader_failed("BlueZ temporarily unavailable")
     assert board.state == "DISCONNECTING"
     assert board.device_connected

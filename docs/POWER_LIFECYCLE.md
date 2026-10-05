@@ -29,7 +29,16 @@ il flusso del driver e hidraw read-only per sensori e pulsante Power.
 Il kernel espone Power come BTN_A, derivato dallo stesso bit del report HID;
 il runtime usa un solo flusso ordinato per gli edge. Mescolare eventi
 evdev e hidraw, con code indipendenti, può riapplicare una pressione dopo
-il rilascio e interpretare l'accensione come spegnimento. La calibrazione
+il rilascio. Sul Raspberry un evento della prima pressione è arrivato
+fino a 6,2 secondi dopo i primi report neutri anche nel solo flusso hidraw:
+non basta ignorare il primo report o applicare 500 ms di debounce.
+La connessione resta CONNECTING durante una finestra iniziale di 10 secondi
+e richiede un rilascio stabile di almeno 500 ms prima di diventare pronta.
+Solo dopo questa fase viene accettata una nuova pressione per spegnere.
+Una pressione mantenuta durante il setup non diventa mai uno spegnimento.
+Durante questa fase il reader riceve i pacchetti ma non pubblica campioni
+come pronti per la misura: la UI mostra "Connessione alla Balance Board...".
+La calibrazione
 0/17/34 kg viene letta dall'attributo bboard_calib del driver Linux;
 conversione e orientamento seguono il driver. Evdev filtra valori identici
 e variazioni minime: un timer sugli snapshot potrebbe scambiare dati vecchi
@@ -147,7 +156,8 @@ questo passaggio.
 ## Uso quotidiano
 
 1. Board OFF: app healthy, connected=false, state=WAITING_FOR_POWER.
-2. Premi soltanto Power frontale; attendi “Balance Board connessa”.
+2. Premi soltanto Power frontale, rilascialo e attendi circa 10 secondi fino
+   a “Balance Board connessa”. Non ripremere Power durante la connessione.
 3. Inizia misurazione, sali e attendi COMPLETED. Puoi fare più pesate.
 4. Premi di nuovo Power: disconnessione, LED blu spento, Gravia offline.
 5. Un nuovo Power riconnette. SYNC non serve nell'uso normale.

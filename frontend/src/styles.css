@@ -69,7 +69,7 @@ h3 {
 }
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 .sidebar {
   width: 238px;
@@ -197,8 +197,13 @@ h3 {
 .main-shell {
   margin-left: 238px;
   width: calc(100% - 238px);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-width: 0;
 }
 .topbar {
+  flex-shrink: 0;
   height: 88px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -250,6 +255,11 @@ h3 {
   max-width: 140px;
 }
 main {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  scroll-padding-block: 20px;
   max-width: 1600px;
   margin: 0 auto;
   padding: 35px 40px 20px;
@@ -2351,8 +2361,8 @@ main {
   font-weight: 750;
 }
 
-/* On desktop the three rows share the available viewport height. Keep normal
-   document flow: errors, zoom and smaller screens can still expand safely. */
+/* The dashboard fits on desktop; the shared main area scrolls when content,
+   errors, zoom or smaller screens need more space. */
 @media (min-width: 900px) and (min-height: 650px) {
   .main-shell:has(.dashboard-page) > .topbar {
     height: 56px;

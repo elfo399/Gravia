@@ -1,6 +1,6 @@
 import { CalendarDays, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { AppSidebar } from './components/AppSidebar';
 import { ProfileSelector } from './components/ProfileSelector';
 import { ThemeToggle } from './components/ThemeControls';
@@ -41,6 +41,7 @@ function HeaderDate() {
 
 function AppLayout() {
   const { loading, error, refresh, live } = useGraviaData();
+  const { pathname } = useLocation();
   return (
     <div className="app-layout">
       <AppSidebar />
@@ -57,7 +58,7 @@ function AppLayout() {
           <ThemeToggle />
           <ProfileSelector />
         </header>
-        <main>
+        <main key={pathname}>
           {error && (
             <div className="error-banner" role="alert">
               <span>{error}</span>

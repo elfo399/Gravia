@@ -276,7 +276,7 @@ Prerequisiti: Raspberry Pi OS **64 bit / ARM64**, Docker Engine con Compose **v2
    curl -s http://127.0.0.1:8080/api/v1/board/status
    ```
 
-   `status=ok` deve essere indipendente dall'hardware; poi attendi `connected=true`, `lastSampleAt` aggiornato e `lastError=null`. Apri **http://IP-DEL-RASPBERRY:8080** dal telefono, oppure il dominio NPM. Verifica separatamente “Live connesso” e “Balance Board connessa”.
+   `status=ok` deve essere indipendente dall'hardware; poi attendi `connected=true`, `lastSampleAt` aggiornato e `lastError=null`. Apri **http://IP-DEL-RASPBERRY:8080** dal telefono, oppure il dominio NPM. Verifica che lo stato della board e il peso si aggiornino senza ricaricare la pagina e che la sidebar mostri “Balance Board connessa”. Il collegamento della pagina non compare più nella barra superiore: un avviso viene mostrato solo se si interrompe.
 
 5. Seleziona il profilo, premi **Inizia misurazione**, sali quando compare **Sali sulla bilancia**, distribuisci il carico e rimani fermo. Controlla che peso e mappa cambino spostando realmente la pressione. Attendi MEASURING → STABILIZING → COMPLETED. Verifica la pesata nello storico e in `/api/v1/measurements`; riavvia il container e verifica che rimanga.
 

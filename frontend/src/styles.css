@@ -213,17 +213,6 @@ h3 {
   text-transform: capitalize;
   flex: 1;
 }
-.connection-status {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--success);
-  font-size: 11px;
-  font-weight: 500;
-}
-.connection-status.offline {
-  color: var(--warning);
-}
 .profile-selector {
   display: flex;
   align-items: center;
@@ -1074,9 +1063,6 @@ td strong {
   .topbar {
     gap: 16px;
   }
-  .connection-status {
-    font-size: 10px;
-  }
   .profile-selector {
     padding-left: 16px;
   }
@@ -1084,6 +1070,7 @@ td strong {
 @media (max-width: 650px) {
   .mobile-brand {
     display: block;
+    margin-right: auto;
     color: var(--text);
     font-size: 13px;
     font-weight: 750;
@@ -1142,9 +1129,6 @@ td strong {
   }
   .topbar-date {
     display: none;
-  }
-  .connection-status {
-    margin-right: auto;
   }
   .profile-selector {
     border: 0;
@@ -1652,10 +1636,6 @@ body {
   font-size: 13px;
   color: var(--text);
 }
-.connection-status {
-  font-size: 11px;
-  white-space: nowrap;
-}
 .theme-toggle {
   display: grid;
   place-items: center;
@@ -2159,14 +2139,6 @@ main {
   }
   .topbar-intro {
     display: none;
-  }
-  .connection-status {
-    font-size: 0;
-    margin-right: auto;
-    gap: 0;
-  }
-  .connection-status svg {
-    width: 16px;
   }
   .profile-selector {
     padding-left: 0;

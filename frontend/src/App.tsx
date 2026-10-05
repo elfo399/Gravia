@@ -1,4 +1,4 @@
-import { CalendarDays, Radio, RefreshCw } from 'lucide-react';
+import { CalendarDays, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { AppSidebar } from './components/AppSidebar';
@@ -52,10 +52,6 @@ function AppLayout() {
             <span>Peso, equilibrio e progressi.</span>
           </div>
           <HeaderDate />
-          <div className={`connection-status ${live.connected ? '' : 'offline'}`}>
-            <Radio size={15} />
-            {live.connected ? 'Live connesso' : 'Riconnessione realtime…'}
-          </div>
           <ThemeToggle />
           <ProfileSelector />
         </header>
@@ -71,7 +67,7 @@ function AppLayout() {
           )}
           {!live.connected && !loading && (
             <div className="connection-banner" role="status">
-              Il realtime è disconnesso. Gravia sta provando a riconnettersi.
+              Collegamento interrotto. Gravia sta provando a riconnettersi.
             </div>
           )}
           {loading ? (

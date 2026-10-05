@@ -1,6 +1,6 @@
 # Jenkins e GitHub
 
-La pipeline del [Jenkinsfile](../Jenkinsfile) usa l'agent Linux ARM64 con etichette `raspberry-pi && docker`. Git, Docker Engine, Docker Compose v2.24.4+ e `flock` devono essere disponibili all'utente dell'agent. Node, pnpm, Python, Ruff e Pytest girano nelle immagini Docker. Non serve un registry né una nuova chiave SSH.
+La pipeline del [Jenkinsfile](../Jenkinsfile) segue la struttura a due fasi di Orio e Synapse: **Scarica main** e **Test, compila e aggiorna Gravia**. Il lavoro è raccolto in [pipeline.sh](pipeline.sh); il job non richiede parametri prima dell'avvio. Usa l'agent Linux ARM64 già configurato con etichette `raspberry-pi && docker`. Git, Docker Engine, Docker Compose v2.24.4+ e `flock` devono essere disponibili all'utente dell'agent. Node, pnpm, Python, Ruff e Pytest girano nelle immagini Docker. Non serve un registry né una nuova chiave SSH.
 
 ## Job Gravia
 
@@ -11,7 +11,7 @@ La pipeline del [Jenkinsfile](../Jenkinsfile) usa l'agent Linux ARM64 con etiche
 - **Trigger:** GitHub hook trigger for GITScm polling. Niente polling periodico.
 - Le build sono serializzate, conservate per le ultime 20 esecuzioni e hanno timeout di 45 minuti.
 
-La prima esecuzione può essere avviata con **Build Now**. I parametri del Jenkinsfile vengono registrati durante quella build; poi compare **Build with Parameters**.
+L'esecuzione manuale usa **Build Now**, come gli altri due job; ogni push su `main` continua ad avviare l'aggiornamento automatico.
 
 ## Webhook del repository
 
@@ -26,9 +26,9 @@ Il webhook avvia il polling SCM: il job controlla `main`, quindi i push senza nu
 
 ## Prima installazione sul Raspberry
 
-Il percorso vuoto di `DEPLOY_DIRECTORY` usa `$HOME/gravia` dell'agent: nell'installazione corrente **`/home/elfo/gravia`**, fuori dal checkout Jenkins. La cartella deve essere vuota oppure contenere un'installazione già configurata con `.env` e Compose. Il bootstrap crea Compose, `.env` privato e `/data` persistente con permessi per il runtime. Non sovrascrive la configurazione delle installazioni esistenti.
+Lo script usa `$HOME/gravia` dell'agent: nell'installazione corrente **`/home/elfo/gravia`**, fuori dal checkout Jenkins. Per un'altra installazione si può impostare `GRAVIA_DEPLOY_DIRECTORY` nell'ambiente dell'agent. La cartella deve essere vuota oppure contenere un'installazione già configurata con `.env` e Compose. Il bootstrap crea Compose, `.env` privato e `/data` persistente con permessi per il runtime. Non sovrascrive la configurazione delle installazioni esistenti.
 
-I parametri iniziali sono `BOARD_MAC=00:24:44:6C:0D:A2`, modalità **real**, `HTTP_PORT=8081`. Il MAC è configurazione della prima installazione. La porta 8080 del Raspberry è già occupata da Jenkins; il bootstrap verifica che la porta scelta sia libera prima di scrivere i file. Gli aggiornamenti conservano `.env`: per cambiare MAC/porta successivamente, modificare quel file sul Raspberry.
+I valori iniziali sono MAC `00:24:44:6C:0D:A2`, modalità **real**, porta HTTP `8081`. Solo per una prima installazione diversa, l'ambiente dello script può impostare `GRAVIA_INITIAL_BOARD_MAC` e `GRAVIA_INITIAL_HTTP_PORT`. La porta 8080 del Raspberry è già occupata da Jenkins; il bootstrap verifica che la porta scelta sia libera prima di scrivere i file. Gli aggiornamenti conservano `.env`: per cambiare MAC/porta successivamente, modificare quel file sul Raspberry.
 
 `GRAVIA_HTTP_PORT` determina la porta interna del processo HTTP, default 8080. In rete host quella è anche la porta del Raspberry. `GRAVIA_PORT` controlla solo la pubblicazione del Compose bridge. Il healthcheck e le verifiche CI leggono `GRAVIA_HTTP_PORT`.
 
@@ -39,6 +39,8 @@ Per Nginx Proxy Manager, l'installazione corrente usa **Forward Hostname `gravia
 NPM 2.12.6 usa un resolver DNS nel suo inoltro standard, che non legge il mapping di `/etc/hosts`. Nell'Advanced del solo Proxy Host pubblico Gravia usare [npm-gravia-location.conf](npm-gravia-location.conf): la direttiva `proxy_pass` con hostname letterale permette a Nginx di usare quella mappatura e conserva HTTP e WebSocket. Se cambi la porta, aggiorna anche `proxy_pass` in questo snippet. Gravia mantiene la rete host necessaria al Bluetooth; gli altri Proxy Host conservano le loro configurazioni.
 
 ## Test e deploy
+
+Le due fasi mostrate su Jenkins raggruppano questi passaggi; il log conserva l'esito di ogni suite:
 
 1. Checkout `main` e verifica Docker ARM64.
 2. Ruff + Pytest backend (JUnit in `reports/backend.xml`).

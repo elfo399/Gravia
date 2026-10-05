@@ -1,3 +1,22 @@
+# Calibrazione Gravia · 5 ottobre 2026
+
+Verifica locale su Docker Desktop / container Linux, con board simulate e database temporanei separati dai dati personali.
+
+| Controllo | Esito |
+| --- | --- |
+| Backend Pytest | **94 passati**, inclusi 23 nuovi casi di calibrazione e integrazione REST su entrambi i trasporti reali |
+| Frontend Vitest | **48 passati**, inclusi 20 casi del wizard/card e il blocco della pesata durante calibrazione |
+| Ruff lint e formato | Passati sul backend e sul codice host esistente |
+| Biome | Passato, 48 file frontend |
+| TypeScript / Vite | Build passata |
+| Alembic | `upgrade head` e `check` passati su SQLite temporaneo; nessuna operazione mancante rilevata |
+| Docker runtime | Immagine amd64 finale costruita con frontend compilato |
+| Browser desktop e mobile 390×844 | Wizard completo, letture di 4 secondi, verifica indipendente e salvataggio su backend di prova |
+| Restart applicazione di prova | Calibrazione ancora Attiva, stessa data e fattore; reset con conferma torna a Non configurata |
+| Isolamento della verifica | Nessuna calibrazione fittizia o pesata di test scritta sul Raspberry |
+
+La calibrazione interna Nintendo resta invariata. Le prove sopra confermano comportamento e persistenza del software, **non l'accuratezza della board fisica**. La procedura con peso noto, restart e cinque pesate reali è nella [guida tecnica](docs/GUIDA_TECNICA.md#procedura-fisica-sul-raspberry). La warning di deprecazione Starlette/TestClient è preesistente e non causa test falliti.
+
 # Jenkins e deploy Raspberry · 5 ottobre 2026
 
 Verifica eseguita sull'agent nativo `orio-raspberry-pi` di [Jenkins](https://jenkins.elfo3.dev/job/Gravia/), oltre alle prove locali sotto riportate.

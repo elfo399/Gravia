@@ -1309,3 +1309,115 @@ td strong {
 .status-dot.offline {
   background: #c88a37;
 }
+
+.calibration-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  margin: auto;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  color: #334155;
+  background: #fff;
+  box-shadow: 0 24px 80px #0f172a33;
+}
+.calibration-dialog::backdrop {
+  background: #0f172a66;
+  backdrop-filter: blur(3px);
+}
+.calibration-dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+.calibration-dialog h2 {
+  margin: 8px 0 0;
+  font-size: 24px;
+  font-weight: 650;
+  color: #0f172a;
+}
+.calibration-dialog > p {
+  margin: 20px 0;
+  line-height: 1.65;
+}
+.calibration-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px 0;
+  margin: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.calibration-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calibration-steps span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f5f9;
+}
+.calibration-steps .current {
+  color: #2563eb;
+}
+.calibration-steps .current span {
+  background: #eff6ff;
+}
+.calibration-success,
+.calibration-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #16745b;
+  font-size: 13px;
+  margin-top: 18px;
+}
+.calibration-progress {
+  color: #2563eb;
+}
+.calibration-reset {
+  border: 0;
+  min-width: 0;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 14px;
+  margin-top: 16px;
+}
+.calibration-reset p {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.calibration-card .form-actions {
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.calibration-dialog .form-actions {
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+@media (max-width: 480px) {
+  .calibration-dialog {
+    padding: 22px;
+  }
+  .calibration-dialog h2 {
+    font-size: 21px;
+  }
+  .calibration-steps {
+    gap: 6px;
+    font-size: 10px;
+  }
+  .calibration-steps li {
+    gap: 5px;
+  }
+  .calibration-results .setting-row {
+    gap: 12px;
+  }
+}

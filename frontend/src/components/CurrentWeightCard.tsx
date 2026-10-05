@@ -61,7 +61,13 @@ export function CurrentWeightCard() {
           </Button>
         ) : (
           <Button
-            disabled={action.busy || !profile || !live.connected || !live.board?.connected}
+            disabled={
+              action.busy ||
+              !profile ||
+              !live.connected ||
+              !live.board?.connected ||
+              live.board.calibrationActive
+            }
             onClick={() => action.start(profileId)}
           >
             {action.busy ? 'Avvio in corso…' : 'Inizia misurazione'}
@@ -73,6 +79,11 @@ export function CurrentWeightCard() {
       {(action.error || (belongsToProfile && live.error)) && (
         <p className="inline-error" role="alert">
           {action.error || live.error}
+        </p>
+      )}
+      {live.board?.calibrationActive && (
+        <p className="settings-note" role="status">
+          Calibrazione in corso. Completa o annulla la calibrazione per iniziare una pesata.
         </p>
       )}
       {live.connected && live.board?.mode === 'real' && !live.board.connected && (

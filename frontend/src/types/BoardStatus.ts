@@ -1,6 +1,7 @@
 export interface BoardStatus {
   mode: 'demo' | 'real';
   connected: boolean;
+  calibrationActive?: boolean;
   state?: 'WAITING_FOR_POWER' | 'CONNECTING' | 'CONNECTED' | 'DISCONNECTING' | null;
   macAddress: string | null;
   lastSampleAt: string | null;

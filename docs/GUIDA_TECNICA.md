@@ -313,6 +313,80 @@ Per provare specificamente `exec` senza il lettore concorrente, configura tempor
 | NPM restituisce 502 dopo rete host | Conserva extra_hosts gravia:host-gateway nel container NPM e la location Advanced con hostname letterale descritta sopra. Per questa installazione usa gravia:8081 e Websockets Support. |
 | Realtime offline ma board connessa | Verifica WebSocket del proxy e `/ws/live`; lo stato hardware e il collegamento browser sono distinti. |
 
+## Calibrazione Balance Board
+
+In **Impostazioni → Calibrazione Balance Board**, Gravia mostra lo stato, la data dell'ultima calibrazione e il fattore di correzione. Il pulsante è disponibile soltanto con board reale connessa, backend/realtime disponibili e nessuna pesata in corso. La modalità demo conserva i suoi campioni originali.
+
+**La calibrazione Gravia non modifica la calibrazione interna della Wii Balance Board.** Non scrive EEPROM, firmware o parametri Nintendo. Si applica ai kg già convertiti dal layer hardware, sia con il trasporto `bluez` sia con il fallback `direct`.
+
+1. Appoggia la board su una superficie **rigida e piana**, completamente vuota; accendila con Power e attendi lo stato connesso.
+2. Premi **Calibra Balance Board → Esegui tara**. Non toccare la pedana: Gravia acquisisce circa 4 secondi e almeno 30 campioni, facendo la media di ogni sensore. Se rileva oltre 2 kg, rimuovi il carico e riprova.
+3. Usa un peso stabile e conosciuto, preferibilmente da palestra, di almeno 5 kg. Inserisci il peso effettivo, maggiore di zero e fino a 150 kg, e posizionalo al centro.
+4. Premi **Avvia calibrazione** e attendi senza muovere il carico. Una seconda finestra determina il fattore globale.
+5. Premi **Verifica peso** mantenendo lo stesso carico. Una **nuova finestra indipendente** mostra il risultato corretto, l'errore in kg e percentuale. Il salvataggio si abilita soltanto se l'errore rientra nella tolleranza.
+6. Premi **Salva calibrazione**. Per ricontrollare dopo il salvataggio, avvia una normale misurazione dello stesso peso. Prima di una pesata umana rimuovi completamente il peso di riferimento.
+7. Se necessario, usa **Ripristina calibrazione → Conferma ripristino** per tornare alle letture hardware originali.
+
+Chiudere il wizard o cambiare pagina scarta i dati temporanei. Una disconnessione, lo spegnimento della board o un riavvio interrompono il wizard; la calibrazione precedentemente salvata rimane intatta. Una sessione temporanea scade dopo 10 minuti. Non è possibile avviare una pesata durante la calibrazione, o viceversa, anche da un'altra scheda del browser.
+
+### Dati, formula e soglie
+
+La migration **`0002_board_calibration`**, successiva a `0001_initial`, aggiunge `board_calibrations`: ID, MAC univoco, quattro offset, un fattore globale, peso noto, peso prima/dopo e data UTC. La calibrazione appartiene alla board, indipendentemente dai profili. Una nuova calibrazione aggiorna la stessa riga; reset elimina soltanto quella del MAC corrente. Non cambia le pesate già salvate.
+
+```text
+offset_i = media dei campioni del sensore i durante la tara
+peso_tarato = somma_i max(0, media_riferimento_i - offset_i)
+weight_scale = peso_noto / peso_tarato
+sensore_corretto_i = max(0, sensore_hardware_i - offset_i) * weight_scale
+peso_corretto = somma_i sensore_corretto_i
+errore_kg = peso_verificato - peso_noto
+errore_percentuale = 100 * errore_kg / peso_noto
+```
+
+`CalibratedBoard` applica questa correzione **una sola volta**, prima di `SessionService` e `StabilityService`. Peso e centro di pressione derivano dal `BoardSample` corretto. Il wizard acquisisce sempre dal layer hardware originale, anche quando esiste già una calibrazione Gravia: le correzioni non si accumulano.
+
+Le soglie sono centralizzate in `CalibrationPolicy`, nel service dedicato: finestra 4 s, minimo 30 campioni, limite complessivo di acquisizione 6 s, tara massima 2 kg, range del peso ≤0,50 kg e deviazione standard ≤0,15 kg. Il fattore deve essere tra 0,75 e 1,25; un fattore esterno a questo intervallo richiede di controllare il carico o la board. Per la verifica si usa **|errore| ≤ max(0,20 kg, 1% del peso noto)**. Nel contratto API `absoluteError` indica lo scostamento in kg **con segno**, per mostrarlo come +0,01 kg; il controllo usa il suo valore assoluto. Non è una certificazione di precisione medicale.
+
+Una nuova verifica invalida subito quella precedente, anche se fallisce: non si può salvare un vecchio esito positivo dopo una lettura instabile. Nessun offset, fattore o campione grezzo viene scritto durante i tre passaggi. Solo **Salva calibrazione** esegue l'upsert nel database.
+
+Il service condivide l'`asyncio.Lock` di `SessionService`; la sessione temporanea riserva la board fra i passaggi, mentre il lock protegge acquisizioni e operazioni concorrenti. Gli avvii incompatibili restituiscono **409**, la board spenta **503**, valori o stabilità non validi **422**. Timeout, annullamento e disconnessione cancellano l'acquisizione e liberano la board. È previsto un solo worker backend, come nel deploy esistente.
+
+La calibrazione è caricata in memoria per MAC e aggiornata al salvataggio, al reset o al cambio board: nessuna query per singolo campione. SQLite nel volume `/data` conserva la riga attraverso restart, reboot e deploy Jenkins, purché si conservi il volume dati esistente.
+
+### API
+
+Base: `/api/v1/board/calibration`. JSON con nomi camelCase, come il resto dell'app.
+
+| Metodo | Percorso relativo | Operazione |
+| --- | --- | --- |
+| GET | `/` | `{configured, calibration, activeSession}`; `calibration` contiene anche i quattro offset |
+| DELETE | `/` | Elimina la calibrazione salvata della board corrente |
+| POST | `/session` | Crea il wizard temporaneo e restituisce ID e stato |
+| GET | `/session/{id}` | Stato/validità della sessione temporanea |
+| DELETE | `/session/{id}` | Annulla senza salvare |
+| POST | `/session/{id}/tare` | Acquisisce gli offset temporanei |
+| POST | `/session/{id}/reference` | Riceve soltanto `{"referenceWeight": 20}` e calcola il fattore |
+| POST | `/session/{id}/verify` | Acquisisce una nuova finestra e verifica il risultato |
+| POST | `/session/{id}/save` | Persiste soltanto una verifica valida |
+
+I comandi senza dati accettano corpo vuoto o `{}`; proprietà aggiuntive vengono rifiutate. Il client non può impostare offset o scale. Lo stato board REST/WebSocket aggiunge `calibrationActive`, utilizzato anche per disabilitare **Inizia misurazione**.
+
+### Procedura fisica sul Raspberry
+
+Questi controlli richiedono il tuo hardware e un peso noto. I test CI usano fake board e non dimostrano l'accuratezza della pedana reale.
+
+1. **EMPTY BOARD:** lascia la board vuota per 5 secondi sulla superficie definitiva, apri il wizard ed esegui la tara. Deve comparire “Tara completata”. Le medie dei sensori vengono calcolate dal backend; dopo il salvataggio leggi i quattro offset da `GET /api/v1/board/calibration`. Una tara caricata o instabile deve mostrare errore senza proseguire.
+2. **KNOWN WEIGHT:** appoggia al centro un peso noto da 10 o 20 kg, inserisci il valore effettivo ed esegui la calibrazione. Annota il peso prima della correzione e il fattore ottenuto.
+3. **VERIFY:** lascia il carico fermo, acquisisci la verifica indipendente e controlla errore ≤0,20 kg per 10/20 kg. Salva soltanto quando il wizard lo dichiara valido. Ripeti una normale misurazione dello stesso peso e confronta il risultato. Le letture del wizard non creano pesate nello storico.
+4. **RESTART:** dalla cartella di deploy sul Raspberry (`/home/elfo/gravia` nell'installazione corrente), esegui `docker compose restart gravia`. Riapri Impostazioni: data, fattore e stato Attiva devono restare uguali. Riaccendi la board se necessario e ripeti la lettura del peso noto. Per il controllo completo ripeti anche dopo un reboot e dopo il successivo deploy, conservando il volume `/data`.
+5. **HUMAN:** rimuovi il carico, usa lo stesso profilo e la stessa posizione e completa **cinque pesate consecutive**, scendendo tra una e l'altra. Annota i cinque valori, il range (massimo−minimo), la deviazione standard della popolazione e gli scostamenti dalla loro media; per le differenze fra pesate annota anche `|peso_n − peso_(n−1)|`. Non attribuire un errore assoluto al peso umano senza una misura indipendente di riferimento. Non modificare automaticamente `StabilityService` in base a un singolo test.
+
+Controlla inoltre annullamento senza salvataggio, Power OFF durante un'acquisizione, blocco di una pesata da una seconda scheda durante il wizard e reset con conferma. Dopo un'interruzione la precedente calibrazione deve rimanere attiva e una nuova sessione deve poter partire. Non condividere pubblicamente il database o i valori delle pesate personali.
+
+### Verifica automatica
+
+La CI verifica Ruff, Biome, backend Pytest, frontend Vitest, TypeScript/Vite e Docker. Il target backend esegue anche `alembic upgrade head` e `alembic check` su un database temporaneo, senza board fisica. I test coprono formula, cache, medie, clamp, centro di pressione, Demo invariata, persistenza, reset, isolamento per MAC, validazione, lock, disconnessione, scadenza e ripetizione della verifica fallita. I test UI coprono i tre passaggi, stati disabilitati, peso invalido, errore, salvataggio, conferma reset, doppio click, navigazione e React StrictMode.
+
 ## Pipeline Jenkins
 
 Push GitHub su `main` → test backend/frontend → build ARM64 → deploy sul Raspberry. Configurazione del job, webhook, prima installazione e rollback: [ci/README.md](../ci/README.md).

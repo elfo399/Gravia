@@ -45,6 +45,17 @@ function mockBoard(connected: boolean) {
 
 describe('starting a measurement', () => {
   beforeEach(() => mockBoard(false));
+  it('prevents starting a measurement during calibration', () => {
+    const start = mockBoard(true);
+    const data = useGraviaData();
+    if (!data.live.board) throw new Error('Missing test board');
+    data.live.board.calibrationActive = true;
+    render(<CurrentWeightCard />);
+    const button = screen.getByRole('button', { name: 'Inizia misurazione' });
+    expect(button).toBeDisabled();
+    fireEvent.click(button);
+    expect(start).not.toHaveBeenCalled();
+  });
   it.each([false, true])('requires hardware availability: %s', (connected) => {
     const start = mockBoard(connected);
     render(<CurrentWeightCard />);

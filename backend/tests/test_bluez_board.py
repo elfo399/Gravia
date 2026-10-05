@@ -174,7 +174,7 @@ def test_bluez_selection_board_off_start_and_demo_regression(database, tmp_path)
             )
         )
     ) as client:
-        assert isinstance(client.app.state.board, BluezRealBoard)
+        assert isinstance(client.app.state.board.hardware, BluezRealBoard)
         assert client.get("/api/v1/board/status").json()["connected"] is False
         assert client.get("/api/v1/health").status_code == 200
     with TestClient(create_app(Settings(database_url=url, board_transport="bluez"))) as client:

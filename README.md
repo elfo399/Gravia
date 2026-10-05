@@ -24,6 +24,7 @@ La tua **Nintendo Wii Balance Board** diventa una bilancia smart, con un'esperie
 - **Peso in tempo reale.** Segui la misura e ritrova il risultato salvato automaticamente.
 - **Equilibrio a colpo d'occhio.** Scopri come distribuisci il carico grazie alla mappa dei quattro sensori.
 - **Progressi nel tempo.** Guarda l'andamento a 7, 30 e 90 giorni, confronta le pesate e aggiungi le tue note.
+- **La tua board, su misura.** Una calibrazione guidata con un peso conosciuto, salvata per le prossime pesate e ripristinabile quando vuoi.
 
 ## Il tuo spazio personale
 

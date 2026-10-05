@@ -25,6 +25,7 @@ class SessionService:
         self.live = live
         self.task: asyncio.Task | None = None
         self.lock = asyncio.Lock()
+        self.calibration = None
         self.measurements = MeasurementService(engine)
 
     def get_session(self, session_id: str):
@@ -52,7 +53,15 @@ class SessionService:
             db.commit()
 
     async def start_measurement_session(self, profile_id: str):
+        if self.calibration and self.calibration.is_active:
+            raise HTTPException(
+                409, "Completa o annulla la calibrazione prima di iniziare una pesata."
+            )
         async with self.lock:
+            if self.calibration and self.calibration.is_active:
+                raise HTTPException(
+                    409, "Completa o annulla la calibrazione prima di iniziare una pesata."
+                )
             ProfileService(self.engine).get_profile(profile_id)
             if self.get_active_session() or (self.task and not self.task.done()):
                 raise HTTPException(409, "Una sessione è già attiva. Attendi o annullala.")

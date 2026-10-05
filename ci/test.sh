@@ -16,7 +16,7 @@ mkdir -p reports
 case "$suite" in
     backend)
         target=backend-tools
-        command='ruff check . /host && ruff format --check . /host && pytest -q --junitxml=/tmp/backend.xml'
+        command='ruff check . /host && ruff format --check . /host && GRAVIA_DATABASE_URL=sqlite:////tmp/migration-check.db alembic upgrade head && GRAVIA_DATABASE_URL=sqlite:////tmp/migration-check.db alembic check && pytest -q --junitxml=/tmp/backend.xml'
         ;;
     frontend)
         target=frontend-build

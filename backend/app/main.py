@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
-from app.api import application, measurements, profiles, sessions
+from app.api import application, board_calibration, measurements, profiles, sessions
 from app.api.application import serve_frontend
 from app.application_lifecycle import application_lifespan
 from app.configuration import Settings
@@ -15,7 +15,13 @@ def create_app(settings: Settings | None = None):
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     app = FastAPI(title="Gravia", version="0.2.0", lifespan=application_lifespan)
     app.state.settings = settings or Settings()
-    for router in (application.router, profiles.router, sessions.router, measurements.router):
+    for router in (
+        application.router,
+        profiles.router,
+        sessions.router,
+        measurements.router,
+        board_calibration.router,
+    ):
         app.include_router(router)
 
     @app.exception_handler(HTTPException)

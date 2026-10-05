@@ -1,6 +1,7 @@
 import { Bluetooth, Database, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/apiRequest';
+import { BoardCalibrationCard } from '../components/BoardCalibrationCard';
 import { useGraviaData } from '../hooks/useGraviaData';
 
 interface BoardSettings {
@@ -32,6 +33,7 @@ export function SettingsPage() {
         </div>
       )}
       <div className="settings-grid">
+        <BoardCalibrationCard />
         <section className="card settings-card">
           <div className="card-heading">
             <h2>Balance Board</h2>

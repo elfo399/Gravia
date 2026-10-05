@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./gravia.db"
     minimum_weight: float = Field(default=20, gt=0)
     required_stability: float = Field(default=95, ge=1, le=100)
+    stability_range_kg: float = Field(default=0.8, gt=0)
+    stability_stddev_kg: float = Field(default=0.3, gt=0)
     stable_duration: float = Field(default=2.5, gt=0)
     session_timeout: float = Field(default=60, gt=0)
     demo_seed: bool = True

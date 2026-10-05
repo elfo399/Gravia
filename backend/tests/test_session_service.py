@@ -41,6 +41,14 @@ class WaitingTestBoard(StableTestBoard):
         yield BoardSample(10, 0, 0, 0, 0)
 
 
+class NoisyTestBoard(StableTestBoard):
+    async def samples(self):
+        for index in range(60):
+            weight = 72.4 + (index % 2) * 0.5
+            yield BoardSample(index / 10, weight / 4, weight / 4, weight / 4, weight / 4)
+            await asyncio.sleep(0)
+
+
 def service_for(database, board, **settings):
     engine, profile, _ = database
     events = RecordedEvents()
@@ -77,6 +85,18 @@ async def test_cancel_does_not_save_partial_weight(database):
     assert result.status == SessionStatus.CANCELLED
     assert result.ended_at is not None
     assert service.measurements.list_measurements() == []
+
+
+async def test_noisy_session_completes_and_saves_once(database):
+    service, profile, events = service_for(database, NoisyTestBoard())
+    session = await service.start_measurement_session(profile.id)
+    await service.task
+    assert service.get_session(session.id).status == SessionStatus.COMPLETED
+    measurements = service.measurements.list_measurements(profile.id)
+    assert len(measurements) == 1
+    assert measurements[0].stability >= 95
+    assert 72.4 < measurements[0].weight < 72.9
+    assert events.events[-1]["type"] == "measurement_completed"
 
 
 async def test_timeout_applies_even_when_adapter_stops_sending(database):

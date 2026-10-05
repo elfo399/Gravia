@@ -28,6 +28,8 @@ def settings(request: Request):
         "boardMode": config.board_mode,
         "minimumWeight": config.minimum_weight,
         "requiredStability": config.required_stability,
+        "stabilityRangeKg": config.stability_range_kg,
+        "stabilityStddevKg": config.stability_stddev_kg,
         "stableDuration": config.stable_duration,
         "sessionTimeout": config.session_timeout,
     }

@@ -117,7 +117,7 @@ Vite espone il frontend sulla porta 5173 e inoltra `/api` e `/ws` al backend sul
 
 `DemoBoard` produce circa 10 campioni al secondo: attesa iniziale, salita progressiva, oscillazioni smorzate e assestamento. Ogni campione contiene quattro carichi in kg; il loro totale determina il peso. Il centro di pressione è normalizzato tra -1 e +1: x positivo a destra, y positivo davanti.
 
-`StabilityService` richiede almeno cinque campioni su una finestra di un secondo. Lo score è `max(0, 100 - max(range_kg * 100, deviazione_standard_kg * 250))`, arrotondato a un decimale. La soglia deve essere mantenuta per la durata configurata. Un'oscillazione o la discesa sotto il peso minimo interrompe la tenuta. Il peso finale è la media della finestra stabile; i sensori vengono scalati insieme per conservarne la distribuzione. Stato COMPLETED e Measurement vengono salvati nella stessa transazione. Nessun risultato parziale è salvato.
+`StabilityService` richiede almeno cinque campioni su una finestra di un secondo. Lo score è `max(0, 100 - 5 * max(range / stability_range_kg, deviazione_standard / stability_stddev_kg))`, visualizzato con un decimale; il confronto usa il valore non arrotondato. Con soglia 95, i limiti predefiniti sono **0,8 kg di range** e **0,3 kg di deviazione standard** nella finestra. Sono tolleranze del segnale, non una percentuale di accuratezza della bilancia. La vecchia scala ammetteva solo 50 g di range e 20 g di deviazione, impedendo il completamento in presenza delle oscillazioni osservate sulla board reale. La soglia deve essere mantenuta per la durata configurata. Un'oscillazione oltre soglia o la discesa sotto il peso minimo interrompe la tenuta. Il peso finale è la media della finestra stabile; i sensori vengono scalati insieme per conservarne la distribuzione. Stato COMPLETED e Measurement vengono salvati nella stessa transazione. Nessun risultato parziale è salvato; una sessione senza stabilità termina con errore al timeout.
 
 La sessione può essere annullata e va in errore al timeout, anche se l'adapter smette di inviare campioni. Dopo un riavvio, le sessioni rimaste attive vengono marcate ERROR; i risultati completati rimangono disponibili. IDLE è implicito e non viene persistito.
 
@@ -135,6 +135,8 @@ La sessione può essere annullata e va in errore al timeout, anche se l'adapter 
 | `GRAVIA_DATABASE_URL` | `sqlite:////data/gravia.db` | SQLite nel container |
 | `GRAVIA_MINIMUM_WEIGHT` | `20` | Peso minimo rilevato, kg |
 | `GRAVIA_REQUIRED_STABILITY` | `95` | Score richiesto, 0–100 |
+| `GRAVIA_STABILITY_RANGE_KG` | `0.8` | Range massimo della finestra allo score 95, in kg |
+| `GRAVIA_STABILITY_STDDEV_KG` | `0.3` | Deviazione standard massima allo score 95, in kg |
 | `GRAVIA_STABLE_DURATION` | `2.5` | Tenuta stabile continua, secondi |
 | `GRAVIA_SESSION_TIMEOUT` | `60` | Durata massima sessione, secondi |
 | `GRAVIA_DEMO_SEED` | `true` | Crea Alfonso se non esistono profili |

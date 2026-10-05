@@ -114,6 +114,8 @@ class SessionService:
             self.settings.minimum_weight,
             self.settings.required_stability,
             self.settings.stable_duration,
+            self.settings.stability_range_kg,
+            self.settings.stability_stddev_kg,
         )
         try:
             async with asyncio.timeout(self.settings.session_timeout):

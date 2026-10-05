@@ -14,7 +14,7 @@ import dbus
 import evdev
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
-from gravia_board_core import BoardLifecycle, decode_report, parse_calibration
+from gravia_board_core import BoardLifecycle, decode_report, parse_calibration, report_button
 
 log = logging.getLogger("gravia-board-agent")
 
@@ -145,20 +145,17 @@ class Agent:
     def read_input(self):
         try:
             for event in self.input.read():
-                if event.type == evdev.ecodes.EV_KEY and event.code == evdev.ecodes.BTN_A:
-                    if event.value in (0, 1):
-                        self.core.button(bool(event.value), time.monotonic())
-                        if self.input is None:
-                            return
-                elif event.type == evdev.ecodes.EV_SYN and event.code == evdev.ecodes.SYN_DROPPED:
-                    self.core.failed("Flusso del pulsante interrotto. Riaccendi la board.")
-                    self.close_reader()
+                # Opening evdev activates the kernel sensor stream. Drain its queue,
+                # but use only ordered hidraw reports for button edges: merging
+                # two independently buffered streams can replay an old press
+                # after a release and turn the power-on gesture into power-off.
+                if event.type == evdev.ecodes.EV_SYN and event.code == evdev.ecodes.SYN_DROPPED:
+                    self.core.reader_failed("Flusso del pulsante interrotto. Riaccendi la board.")
                     return
         except BlockingIOError:
             pass
         except OSError:
-            self.close_reader()
-            self.core.changed(False)
+            self.core.reader_failed("Connessione al lettore della Balance Board interrotta.")
 
     def read_raw(self):
         try:
@@ -167,14 +164,16 @@ class Agent:
                 report = os.read(self.raw_fd, 64)
                 if not report:
                     raise OSError("HID disconnected")
+                now = time.monotonic()
+                pressed = report_button(report)
+                if pressed is not None:
+                    self.core.button(pressed, now)
+                    if self.raw_fd is None:
+                        return
                 sample = decode_report(report, self.calibration)
                 if sample is None:
                     continue
-                now = time.monotonic()
                 self.last_packet = now
-                self.core.button(bool(report[2] & 8), now)
-                if self.raw_fd is None:
-                    return
                 if self.core.sample() and now - self.last_sent >= 0.1:
                     self.last_sent = now
                     self.sequence += 1
@@ -190,8 +189,7 @@ class Agent:
         except BlockingIOError:
             pass
         except OSError:
-            self.close_reader()
-            self.core.changed(False)
+            self.core.reader_failed("Connessione al lettore della Balance Board interrotta.")
 
     def disconnect(self):
         if self.path is None:
@@ -231,17 +229,14 @@ class Agent:
                             if self.input is None:
                                 self.open_reader()
                             elif now - self.last_packet > 2:
-                                self.close_reader()
-                                self.core.state = "CONNECTING"
-                                self.core.failed(
+                                self.core.reader_failed(
                                     "Nessun nuovo campione. Riaccendi la Balance Board."
                                 )
                     except (dbus.DBusException, OSError, ValueError) as error:
-                        log.warning("Hardware unavailable: %s", error)
-                        self.close_reader()
-                        if self.core.state != "DISCONNECTING":
-                            self.core.changed(False)
-                        self.core.failed("Lettore Balance Board non disponibile sul Raspberry.")
+                        message = "Lettore Balance Board non disponibile sul Raspberry."
+                        if self.core.error != message:
+                            log.warning("Hardware unavailable: %s", error)
+                        self.core.reader_failed(message)
                     # Status heartbeat is not a sensor sample.
                     payload = (json.dumps(self.envelope(self.core.snapshot())) + "\n").encode()
                     for writer in tuple(self.clients):

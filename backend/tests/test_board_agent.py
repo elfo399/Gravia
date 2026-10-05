@@ -89,3 +89,64 @@ def test_kernel_calibration_sensor_mapping_and_identical_packets():
 def test_invalid_calibration_rejected(text):
     with pytest.raises(ValueError):
         core.parse_calibration(text)
+
+
+def test_startup_release_grace_does_not_power_off_on_delayed_input_event():
+    board, _, actions = lifecycle()
+    board.changed(True)
+    board.sample()
+    board.button(False, 10)
+    board.button(True, 10.1)
+    assert actions == []
+    board.button(False, 10.2)
+    board.button(True, 10.6)
+    assert actions == ["close", "disconnect"]
+
+
+def test_power_uses_core_button_reports_even_without_sensor_payload():
+    board, _, actions = lifecycle()
+    board.changed(True)
+    board.button(core.report_button(bytes([0x20, 0, 8])), 1)
+    board.sample()
+    board.button(core.report_button(bytes([0x32, 0, 0])), 2)
+    assert actions == []
+    board.button(core.report_button(bytes([0x30, 0, 8])), 3)
+    assert actions == ["close", "disconnect"]
+    assert core.report_button(bytes([0x3D, 0, 8])) is None
+    assert core.report_button(bytes([0x20, 0])) is None
+
+
+def test_reader_error_cannot_acknowledge_an_intentional_bluetooth_disconnect():
+    board, events, _ = lifecycle()
+    board.changed(True)
+    board.sample()
+    board.button(False, 10)
+    board.button(True, 11)
+    board.reader_failed("BlueZ temporarily unavailable")
+    assert board.state == "DISCONNECTING"
+    assert board.device_connected
+    board.changed(True)
+    assert board.state == "DISCONNECTING"
+    board.changed(False)
+    assert events[-1]["state"] == "WAITING_FOR_POWER"
+
+
+@pytest.mark.parametrize(
+    "mac,vendor,expected",
+    [
+        ("00:24:44:6c:0d:a2", "0005:0000057E:00000306", True),
+        ("00:24:44:6c:0d:ff", "0005:0000057E:00000306", False),
+        ("00:24:44:6c:0d:a2", "0003:0000057E:00000306", False),
+    ],
+)
+def test_udev_matches_only_target_bluetooth_board_ancestor(tmp_path, mac, vendor, expected):
+    path = source.with_name("gravia_board_udev.py")
+    spec = importlib.util.spec_from_file_location("udev_match", path)
+    matcher = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(matcher)
+    hid = tmp_path / "hid"
+    event = hid / "input" / "input7" / "event5"
+    event.mkdir(parents=True)
+    (event.parent / "uevent").write_text("NAME=Balance Board\n")
+    (hid / "uevent").write_text(f"HID_UNIQ={mac}\nHID_ID={vendor}\n")
+    assert matcher.matches_board(event, "00:24:44:6C:0D:A2") is expected

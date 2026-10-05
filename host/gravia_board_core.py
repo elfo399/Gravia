@@ -3,6 +3,14 @@
 import struct
 
 
+def report_button(report):
+    # These HID reports carry the two core button bytes before their payload.
+    # Extension-only/interleaved reports do not have this layout.
+    if len(report) >= 3 and report[0] in (0x20, 0x21, 0x22, *range(0x30, 0x38)):
+        return bool(report[2] & 8)
+    return None
+
+
 def parse_calibration(text):
     values = [int(value, 16) for value in text.strip().split(":")]
     if len(values) != 12:
@@ -107,5 +115,14 @@ class BoardLifecycle:
 
     def failed(self, message):
         if self.error != message:
+            self.error = message
+            self.publish(self.snapshot())
+
+    def reader_failed(self, message):
+        self.close_reader()
+        previous = self.state
+        if self.state != "DISCONNECTING":
+            self.state = "CONNECTING" if self.device_connected else "WAITING_FOR_POWER"
+        if self.error != message or self.state != previous:
             self.error = message
             self.publish(self.snapshot())

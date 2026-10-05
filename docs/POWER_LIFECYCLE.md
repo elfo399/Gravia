@@ -12,13 +12,24 @@ quando self.board è None; se esiste ma connected è False, restituisce ancora
 True. Il commento upstream sul reconnect non contiene un'implementazione:
 use_daemon=True non risolve il requisito.
 
+Il [plugin Wii di BlueZ 5.66](https://github.com/bluez/bluez/blob/5.66/plugins/wiimote.c)
+specifica anche che pairing con SYNC **seguito dalla prima connessione HID**
+abilita il reconnect. Paired/Trusted da soli non lo garantiscono. Una sola
+Device1.Connect nel setup iniziale è distinta dal loop outbound vietato
+nell'uso quotidiano; l'agent runtime non chiama mai Connect.
+
 Raspberry verificato: Bookworm ARM64, BlueZ 5.66, kernel
 6.12.47+rpt-rpi-2712. hid_wiimote e hidp sono disponibili; Input1.ReconnectMode
 della board è device. Pairing già presente (Paired=yes, Bonded=yes), Trusted=no.
-Il setup conserva il pairing e imposta Trusted; non rimuove il device.
+Il setup conserva normalmente il pairing e imposta Trusted. Il vecchio
+record di questa installazione ha richiesto il recovery esplicito descritto sotto.
 
-Il servizio Python 3 usa D-Bus per stato e Disconnect, evdev BTN_A per Power
-e hidraw read-only per ogni nuovo report dei sensori. La calibrazione
+Il servizio Python 3 usa D-Bus per stato e Disconnect, evdev per attivare
+il flusso del driver e hidraw read-only per sensori e pulsante Power.
+Il kernel espone Power come BTN_A, derivato dallo stesso bit del report HID;
+il runtime usa un solo flusso ordinato per gli edge. Mescolare eventi
+evdev e hidraw, con code indipendenti, può riapplicare una pressione dopo
+il rilascio e interpretare l'accensione come spegnimento. La calibrazione
 0/17/34 kg viene letta dall'attributo bboard_calib del driver Linux;
 conversione e orientamento seguono il driver. Evdev filtra valori identici
 e variazioni minime: un timer sugli snapshot potrebbe scambiare dati vecchi
@@ -51,6 +62,8 @@ Utente gravia-board dedicato; udev permette solo i nodi input/hidraw del MAC;
 la policy D-Bus consente osservazione e solo Disconnect del device su hci0.
 Se cambi adattatore, aggiorna la policy per il path reale.
 L'installer crea modules-load.d/gravia-wii.conf e gravia-board-agent.service:
+carica esplicitamente hid_wiimote e hidp, disponibili ma non caricati
+all'inizio della verifica. Non dipende dall'autoload tramite il container.
 boot dopo Bluetooth, restart dopo crash, attesa passiva con board spenta,
 log di connessioni e disconnessioni senza stampare i pesi. Non modifica ERTM.
 
@@ -70,7 +83,9 @@ agent on
 default-agent
 scan on
 pair 00:24:44:6C:0D:A2
+connect 00:24:44:6C:0D:A2
 trust 00:24:44:6C:0D:A2
+disconnect 00:24:44:6C:0D:A2
 scan off
 info 00:24:44:6C:0D:A2
 quit
@@ -78,6 +93,28 @@ quit
 
 Verifica Paired=yes e Trusted=yes. BlueZ conserva i dati in
 /var/lib/bluetooth; il servizio non fa remove o re-pair all'avvio.
+
+Se un vecchio pairing direct risulta Paired/Trusted ma Power lampeggia e si
+spegne, completare la prima connessione HID mantenendo il pairing:
+`sudo sh scripts/setup_balance_board.sh MAC --initialize-hid`.
+Questo singolo passaggio usa SYNC nel setup/recovery, non a ogni accensione.
+
+Sul Raspberry il vecchio record ha prodotto autenticazione “Invalid exchange
+(52)”, con pairing/trust presenti ma chiave rifiutata. È stato necessario
+salvare il record e rimuovere **solo quel MAC**, una volta, prima del nuovo
+pairing. Lo script non rimuove mai automaticamente associazioni. In caso di
+identico errore verificato, eseguire esplicitamente `bluetoothctl remove MAC`
+e ripetere FIRST PAIR con agent attivo; Pair deve riuscire prima di Connect.
+
+Le regole udev verificano HID_UNIQ nell'uevent del parent HID: input/uniq
+del driver è vuoto. L'assegnazione finale GROUP:= evita che 99-com.rules
+di Raspberry ripristini il gruppo input; il servizio non appartiene a input.
+Hidraw è leggibile dal gruppo ma non scrivibile (0640).
+
+RuntimeDirectoryPreserve=yes conserva la directory /run/gravia durante
+restart dell'agent: Docker monta la directory, quindi deve mantenere il
+medesimo inode mentre il socket viene ricreato. /run resta temporaneo e
+viene ricreato al boot. Un restart agent non richiede restart di Gravia.
 
 ## Docker e migrazione
 

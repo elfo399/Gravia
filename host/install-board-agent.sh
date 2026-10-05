@@ -10,17 +10,14 @@ apt-get update
 apt-get install -y --no-install-recommends python3-dbus python3-gi python3-evdev
 id gravia-board >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin gravia-board
 install -d -m 0755 /opt/gravia-board-agent /etc/gravia
-install -m 0644 "$source/gravia_board_agent.py" "$source/gravia_board_core.py" /opt/gravia-board-agent/
+install -m 0644 "$source/gravia_board_agent.py" "$source/gravia_board_core.py" "$source/gravia_board_udev.py" /opt/gravia-board-agent/
 install -m 0644 "$source/gravia-board-agent.service" /etc/systemd/system/
 printf 'GRAVIA_BOARD_MAC=%s\n' "$mac" > /etc/gravia/board-agent.env
 chmod 0644 /etc/gravia/board-agent.env
-lower=$(printf '%s' "$mac" | tr '[:upper:]' '[:lower:]')
 # Only this board's input/HID nodes. No membership in the broad input group.
 cat > /etc/udev/rules.d/70-gravia-board.rules <<EOF
-SUBSYSTEM=="input", KERNEL=="event*", ATTRS{uniq}=="$lower", GROUP="gravia-board", MODE="0660"
-SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{uniq}=="$lower", GROUP="gravia-board", MODE="0660"
-SUBSYSTEM=="input", KERNEL=="event*", ATTRS{uniq}=="$mac", GROUP="gravia-board", MODE="0660"
-SUBSYSTEM=="hidraw", KERNEL=="hidraw*", ATTRS{uniq}=="$mac", GROUP="gravia-board", MODE="0660"
+SUBSYSTEM=="input", KERNEL=="event*", PROGRAM="/usr/bin/python3 /opt/gravia-board-agent/gravia_board_udev.py %p $mac", RESULT=="gravia-board", GROUP:="gravia-board", MODE:="0660"
+SUBSYSTEM=="hidraw", KERNEL=="hidraw*", PROGRAM="/usr/bin/python3 /opt/gravia-board-agent/gravia_board_udev.py %p $mac", RESULT=="gravia-board", GROUP:="gravia-board", MODE:="0640"
 EOF
 device_path=/org/bluez/hci0/dev_$(printf '%s' "$mac" | tr ':' '_')
 cat > /etc/dbus-1/system.d/gravia-board.conf <<EOF
@@ -34,8 +31,9 @@ cat > /etc/dbus-1/system.d/gravia-board.conf <<EOF
 </busconfig>
 EOF
 systemctl reload dbus.service
-printf 'hid_wiimote\n' > /etc/modules-load.d/gravia-wii.conf
+printf 'hid_wiimote\nhidp\n' > /etc/modules-load.d/gravia-wii.conf
 modprobe hid_wiimote
+modprobe hidp
 udevadm control --reload-rules
 udevadm trigger --subsystem-match=input --subsystem-match=hidraw
 systemctl daemon-reload

@@ -1,49 +1,51 @@
-<h1 align="center">GRAVIA</h1>
+<p align="center">
+  <img src="docs/assets/gravia-icon.svg" width="88" height="88" alt="Icona Gravia">
+</p>
+
+<h1 align="center">Gravia</h1>
 
 <p align="center"><strong>Weight. Balance. Insight.</strong></p>
 
 <p align="center">
-  Dai nuova vita alla tua Wii Balance Board.<br>
-  Peso, equilibrio e progressi. Tutto in un unico spazio.
+  La tua Wii Balance Board, una nuova abitudine.<br>
+  Peso, equilibrio e progressi in uno spazio tutto tuo.
 </p>
 
 <p align="center">
-  <a href="docs/GUIDA_TECNICA.md#avvio-rapido"><strong>Scopri Gravia</strong></a>
-  &nbsp; · &nbsp;
-  <a href="docs/GUIDA_TECNICA.md">Guida all'installazione</a>
+  <a href="docs/GUIDA_TECNICA.md#avvio-rapido"><strong>Inizia con Gravia →</strong></a>
 </p>
 
-## Un piccolo gesto, ogni giorno
+![La home di Gravia: peso, quattro sensori, andamento, storico, statistiche e BMI in tema scuro](docs/assets/gravia-home.jpg)
 
-Accendi la board, scegli il tuo profilo e sali. Gravia segue il peso in tempo reale e salva la pesata quando si assesta. A te resta uno storico da cui osservare il tuo percorso.
+<p align="center"><sub>La dashboard in modalità demo · Dati illustrativi</sub></p>
 
-La tua **Nintendo Wii Balance Board** diventa una bilancia smart, con un'esperienza pensata per il computer e il telefono.
+## La tua board. Una nuova abitudine.
 
-## Peso. Equilibrio. Prospettiva.
+Dai nuova vita alla **Nintendo Wii Balance Board**. Accendila, scegli il tuo profilo e sali: Gravia segue la pesata e salva il risultato quando la misura si stabilizza. Dal computer o dal telefono, ritrovi ogni giorno il tuo percorso.
 
-- **Peso in tempo reale.** Segui la misura e ritrova il risultato salvato automaticamente.
-- **Equilibrio a colpo d'occhio.** Scopri come distribuisci il carico grazie alla mappa dei quattro sensori.
-- **Progressi nel tempo.** Guarda l'andamento a 7, 30 e 90 giorni, confronta le pesate e aggiungi le tue note.
-- **La tua board, su misura.** Una calibrazione guidata con un peso conosciuto, salvata per le prossime pesate e ripristinabile quando vuoi.
-- **Un momento per il tuo equilibrio.** Con Training trovi il centro, segui piccoli spostamenti e osservi l'appoggio sui due piedi. Tre esercizi brevi, risultati personali e nuovi progressi da ritrovare.
+## Tutto quello che conta, a colpo d’occhio
 
-## Il tuo spazio personale
+- **Il tuo peso, nel tempo.** Pesate, grafici e statistiche per seguire i cambiamenti e aggiungere le tue note.
+- **Il tuo equilibrio, visibile.** Quattro sensori e una mappa della pedana mostrano come distribuisci il carico.
+- **Un piccolo momento di Training.** Trova il centro con **Balance Hold**, segui i target di **Weight Shift** e cerca un appoggio uniforme con **Symmetry**. Ritrova risultati e record personali.
+- **Uno spazio per ciascuno.** Profili separati, storico personale e dati conservati nella tua installazione.
 
-Una dashboard riunisce misurazioni, variazioni e statistiche. Ogni persona ha il proprio profilo e il proprio storico. I dati restano nella tua installazione, senza creare un account cloud.
+## La luce che preferisci
 
-Scegli la luce giusta per te: **tema chiaro, scuro o automatico**, per ritrovare il tuo spazio anche la sera.
+Chiaro, scuro o automatico. Gravia si adatta al tuo schermo e alla luce della giornata, con un’interfaccia pensata anche per il telefono.
 
-## Pronta per una nuova vita
+## Comincia da ciò che hai
 
-Usa Gravia con la tua Balance Board e un Raspberry Pi. Oppure esplora la **modalità demo**: puoi conoscere l'app, provare una pesata simulata e scoprire Training anche senza hardware.
+Una Balance Board e un Raspberry Pi bastano per dare forma al tuo spazio. La calibrazione guidata ti aiuta a personalizzare le letture della pedana.
 
-<p align="center"><strong>Una board che conosci già. Una nuova abitudine da scoprire.</strong></p>
+Vuoi prima conoscere Gravia? La **modalità demo** ti permette di esplorare la dashboard e provare pesate simulate e Training anche senza hardware.
+
+<p align="center"><strong>Un piccolo gesto. Una nuova prospettiva.</strong></p>
 
 ---
 
 <p align="center">
-  Gravia v0.3 &nbsp; · &nbsp;
-  <a href="docs/GUIDA_TECNICA.md">Documentazione</a> &nbsp; · &nbsp;
-  <a href="docs/POWER_LIFECYCLE.md">La tua Balance Board</a> &nbsp; · &nbsp;
-  <a href="ci/README.md">Sviluppo e deploy</a>
+  <a href="docs/GUIDA_TECNICA.md">Installazione</a> ·
+  <a href="docs/TRAINING.md">Scopri Training</a> ·
+  <a href="docs/POWER_LIFECYCLE.md">La tua Balance Board</a>
 </p>
